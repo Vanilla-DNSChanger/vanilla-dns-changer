@@ -117,10 +117,10 @@ app.whenReady().then(async () => {
   createWindow();
 
   // Create tray
-  tray = createTray(mainWindow!, store);
+  tray = createTray(mainWindow!, store as any);
 
   // Register IPC handlers
-  registerIpcHandlers(store, mainWindow!);
+  registerIpcHandlers(store as any, mainWindow!);
 
   // Check for updates
   if (process.env.NODE_ENV !== 'development') {
