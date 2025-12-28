@@ -1,0 +1,63 @@
+{
+  "name": "vanilla-dns-changer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "🌐 Open-source DNS Changer for Windows, macOS, and Linux - Desktop App, CLI Tool & Website",
+  "author": {
+    "name": "SudoLite",
+    "url": "https://x.com/sudolite"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vanilla-DNSChanger/vanilla-dns-changer.git"
+  },
+  "homepage": "https://vanilla-dnschanger.github.io",
+  "bugs": {
+    "url": "https://github.com/Vanilla-DNSChanger/vanilla-dns-changer/issues"
+  },
+  "keywords": [
+    "dns",
+    "dns-changer",
+    "network",
+    "privacy",
+    "electron",
+    "cli",
+    "cross-platform"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky install",
+    "desktop": "pnpm --filter @vanilla-dns/desktop",
+    "cli": "pnpm --filter @vanilla-dns/cli",
+    "website": "pnpm --filter @vanilla-dns/website",
+    "shared": "pnpm --filter @vanilla-dns/shared"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}

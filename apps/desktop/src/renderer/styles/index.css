@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(83, 252, 24, 0.3);
+  color: #fff;
+}
+
+/* Remove outline on focus */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #53FC18;
+  outline-offset: 2px;
+}
+
+/* Custom drag region for frameless window */
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Glow effect */
+.glow-green {
+  box-shadow: 0 0 20px rgba(83, 252, 24, 0.3);
+}
+
+.glow-green-sm {
+  box-shadow: 0 0 10px rgba(83, 252, 24, 0.2);
+}
+
+/* Pulse animation */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #53FC18 0%, #45d615 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(83, 252, 24, 0.1);
+}
+
+/* RTL support for Persian */
+[dir="rtl"] {
+  font-family: 'Vazirmatn', sans-serif;
+}
+
+/* Connection status indicator */
+.status-connected {
+  @apply bg-vanilla-green-400;
+  animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.status-disconnected {
+  @apply bg-gray-500;
+}
+
+/* Button styles */
+.btn-vanilla {
+  @apply bg-vanilla-green-400 text-black font-medium px-6 py-2 rounded-lg;
+  @apply hover:bg-vanilla-green-hover transition-all duration-200;
+  @apply active:scale-95;
+}
+
+.btn-vanilla-outline {
+  @apply border border-vanilla-green-400 text-vanilla-green-400;
+  @apply hover:bg-vanilla-green-400 hover:text-black;
+  @apply transition-all duration-200 px-6 py-2 rounded-lg;
+}
+
+/* Server card */
+.server-card {
+  @apply bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl p-4;
+  @apply transition-all duration-200 cursor-pointer;
+}
+
+.server-card:hover {
+  @apply border-vanilla-green-400 bg-vanilla-dark-50;
+}
+
+.server-card.selected {
+  @apply border-vanilla-green-400 bg-vanilla-dark-50;
+  box-shadow: 0 0 0 1px #53FC18;
+}

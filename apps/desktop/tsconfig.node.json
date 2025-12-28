@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ES2020",
+    "outDir": "dist/main",
+    "rootDir": "src/main",
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/main/**/*", "electron/**/*", "vite.config.ts"]
+}

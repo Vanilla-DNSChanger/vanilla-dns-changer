@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(83, 252, 24, 0.3);
+  color: #fff;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #53FC18 0%, #45d615 50%, #6ffd42 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effects */
+.glow-green {
+  box-shadow: 0 0 20px rgba(83, 252, 24, 0.3), 0 0 40px rgba(83, 252, 24, 0.1);
+}
+
+.glow-green-lg {
+  box-shadow: 0 0 40px rgba(83, 252, 24, 0.4), 0 0 80px rgba(83, 252, 24, 0.2);
+}
+
+/* Button hover effect */
+.btn-glow {
+  transition: all 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(83, 252, 24, 0.5), 0 0 40px rgba(83, 252, 24, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Card hover */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(83, 252, 24, 0.1);
+}
+
+/* Background patterns */
+.bg-grid {
+  background-image: 
+    linear-gradient(rgba(83, 252, 24, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(83, 252, 24, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.bg-radial {
+  background: radial-gradient(ellipse at center, rgba(83, 252, 24, 0.1) 0%, transparent 70%);
+}
+
+/* Animation delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }

@@ -1,0 +1,65 @@
+{
+  "name": "@vanilla-dns/cli",
+  "version": "1.0.0",
+  "description": "Vanilla DNS Changer - Command Line Interface",
+  "author": {
+    "name": "SudoLite",
+    "url": "https://x.com/sudolite"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "vdns": "./bin/run.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "oclif.manifest.json"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist",
+    "prepack": "pnpm run build && oclif manifest",
+    "postpack": "rm -f oclif.manifest.json"
+  },
+  "dependencies": {
+    "@oclif/core": "^3.15.1",
+    "@oclif/plugin-help": "^6.0.12",
+    "@vanilla-dns/shared": "workspace:*",
+    "axios": "^1.6.5",
+    "chalk": "^4.1.2",
+    "enquirer": "^2.4.1",
+    "ora": "^5.4.1",
+    "sudo-prompt": "^9.2.1"
+  },
+  "devDependencies": {
+    "@oclif/test": "^3.1.10",
+    "@types/node": "^20.10.6",
+    "eslint": "^8.56.0",
+    "oclif": "^4.1.3",
+    "typescript": "^5.3.3"
+  },
+  "oclif": {
+    "bin": "vdns",
+    "dirname": "vdns",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "topicSeparator": " "
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vanilla-DNSChanger/vanilla-dns-changer.git",
+    "directory": "apps/cli"
+  },
+  "keywords": [
+    "dns",
+    "dns-changer",
+    "cli",
+    "network"
+  ]
+}

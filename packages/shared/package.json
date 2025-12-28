@@ -1,0 +1,61 @@
+{
+  "name": "@vanilla-dns/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities, types, and constants for Vanilla DNS Changer",
+  "author": {
+    "name": "SudoLite",
+    "url": "https://x.com/sudolite"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./interfaces": {
+      "import": "./dist/interfaces/index.mjs",
+      "require": "./dist/interfaces/index.js",
+      "types": "./dist/interfaces/index.d.ts"
+    },
+    "./validators": {
+      "import": "./dist/validators/index.mjs",
+      "require": "./dist/validators/index.js",
+      "types": "./dist/validators/index.d.ts"
+    },
+    "./constants": {
+      "import": "./dist/constants/index.mjs",
+      "require": "./dist/constants/index.js",
+      "types": "./dist/constants/index.d.ts"
+    },
+    "./platforms": {
+      "import": "./dist/platforms/index.mjs",
+      "require": "./dist/platforms/index.js",
+      "types": "./dist/platforms/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vanilla-DNSChanger/vanilla-dns-changer.git",
+    "directory": "packages/shared"
+  }
+}
