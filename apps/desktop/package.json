@@ -73,6 +73,7 @@
   "build": {
     "appId": "com.sudolite.vanilla-dns",
     "productName": "Vanilla DNS Changer",
+    "artifactName": "Vanilla-DNS-Changer-${version}-${arch}.${ext}",
     "copyright": "Copyright © 2025 SudoLite",
     "directories": {
       "output": "release"
@@ -92,7 +93,8 @@
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": true
+      "deleteAppDataOnUninstall": true,
+      "artifactName": "Vanilla-DNS-Setup-${version}.${ext}"
     },
     "mac": {
       "target": [
@@ -107,7 +109,11 @@
         "deb"
       ],
       "icon": "public/icons",
-      "category": "Utility"
+      "category": "Utility",
+      "executableName": "vanilla-dns-changer"
+    },
+    "deb": {
+      "artifactName": "Vanilla-DNS-Changer-${version}-${arch}.${ext}"
     },
     "publish": {
       "provider": "github",
