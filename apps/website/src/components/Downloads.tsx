@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Monitor, Apple, Terminal, Download } from 'lucide-react';
 import { useI18n } from '../i18n';
 
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const RELEASES_URL = 'https://github.com/Vanilla-DNSChanger/vanilla-dns-changer/releases';
 const DOWNLOAD_BASE = `${RELEASES_URL}/download/v${VERSION}`;
 
