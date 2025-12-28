@@ -1,7 +1,14 @@
 import { Tray, Menu, nativeImage, app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import Store from 'electron-store';
-import type { StoreData } from '@vanilla-dns/shared';
+
+interface StoreData {
+  config: any;
+  pinnedServers: string[];
+  customServers: any[];
+  lastConnectedServer?: string;
+  connectionHistory: any[];
+}
 
 let isConnected = false;
 

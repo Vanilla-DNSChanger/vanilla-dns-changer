@@ -1,9 +1,67 @@
 import { ipcMain, shell, app, BrowserWindow } from 'electron';
 import Store from 'electron-store';
-import { IPC_CHANNELS, STORE_KEYS } from '@vanilla-dns/shared';
-import type { StoreData, DnsServer, CustomDnsServer, AppConfig } from '@vanilla-dns/shared';
 import { getPlatform } from './platforms';
 import { setTrayConnectionStatus } from './tray';
+
+// Types
+interface AppConfig {
+  language: 'en' | 'fa';
+  theme: 'dark' | 'light' | 'system';
+  startMinimized: boolean;
+  minimizeToTray: boolean;
+  autoStart: boolean;
+  showNotifications: boolean;
+  enableAnalytics: boolean;
+  autoSyncServers: boolean;
+  lastServerSync?: number;
+  selectedInterface?: string;
+}
+
+interface CustomDnsServer {
+  key: string;
+  name: string;
+  servers: [string, string | null];
+  category: string;
+  description?: string;
+  addedAt: number;
+}
+
+interface StoreData {
+  config: AppConfig;
+  pinnedServers: string[];
+  customServers: CustomDnsServer[];
+  lastConnectedServer?: string;
+  connectionHistory: any[];
+}
+
+const STORE_KEYS = {
+  CONFIG: 'config' as const,
+  PINNED_SERVERS: 'pinnedServers' as const,
+  CUSTOM_SERVERS: 'customServers' as const,
+  CONNECTION_HISTORY: 'connectionHistory' as const,
+};
+
+const IPC_CHANNELS = {
+  DNS_CONNECT: 'dns:connect',
+  DNS_DISCONNECT: 'dns:disconnect',
+  DNS_STATUS: 'dns:status',
+  DNS_FLUSH: 'dns:flush',
+  DNS_PING: 'dns:ping',
+  NETWORK_INTERFACES: 'network:interfaces',
+  CONFIG_GET: 'config:get',
+  CONFIG_SET: 'config:set',
+  SERVERS_GET: 'servers:get',
+  SERVERS_ADD_CUSTOM: 'servers:add-custom',
+  SERVERS_REMOVE_CUSTOM: 'servers:remove-custom',
+  SERVERS_PIN: 'servers:pin',
+  SERVERS_UNPIN: 'servers:unpin',
+  WINDOW_MINIMIZE: 'window:minimize',
+  WINDOW_MAXIMIZE: 'window:maximize',
+  WINDOW_CLOSE: 'window:close',
+  APP_VERSION: 'app:version',
+  APP_OPEN_EXTERNAL: 'app:open-external',
+  APP_QUIT: 'app:quit',
+};
 
 export function registerIpcHandlers(store: Store<StoreData>, mainWindow: BrowserWindow) {
   const platform = getPlatform();

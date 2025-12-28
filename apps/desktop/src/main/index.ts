@@ -4,8 +4,46 @@ import Store from 'electron-store';
 import { autoUpdater } from 'electron-updater';
 import { registerIpcHandlers } from './ipc';
 import { createTray } from './tray';
-import { DEFAULT_CONFIG, STORE_KEYS } from '@vanilla-dns/shared';
-import type { StoreData } from '@vanilla-dns/shared';
+
+// Types
+interface AppConfig {
+  language: 'en' | 'fa';
+  theme: 'dark' | 'light' | 'system';
+  startMinimized: boolean;
+  minimizeToTray: boolean;
+  autoStart: boolean;
+  showNotifications: boolean;
+  enableAnalytics: boolean;
+  autoSyncServers: boolean;
+  lastServerSync?: number;
+  selectedInterface?: string;
+}
+
+interface StoreData {
+  config: AppConfig;
+  pinnedServers: string[];
+  customServers: any[];
+  lastConnectedServer?: string;
+  connectionHistory: any[];
+}
+
+const STORE_KEYS = {
+  CONFIG: 'config',
+  PINNED_SERVERS: 'pinnedServers',
+  CUSTOM_SERVERS: 'customServers',
+  CONNECTION_HISTORY: 'connectionHistory',
+};
+
+const DEFAULT_CONFIG: AppConfig = {
+  language: 'en',
+  theme: 'dark',
+  startMinimized: false,
+  minimizeToTray: true,
+  autoStart: false,
+  showNotifications: true,
+  enableAnalytics: false,
+  autoSyncServers: true,
+};
 
 // Store instance
 const store = new Store<StoreData>({
@@ -60,7 +98,7 @@ function createWindow() {
   // Handle close
   mainWindow.on('close', (e) => {
     const config = store.get(STORE_KEYS.CONFIG);
-    if (config?.minimizeToTray && !app.isQuitting) {
+    if (config?.minimizeToTray && !(app as any).isQuitting) {
       e.preventDefault();
       mainWindow?.hide();
     }
