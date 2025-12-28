@@ -9,20 +9,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout
+      - name: Checkout main repo
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -57,22 +51,11 @@ jobs:
       - name: Build website
         run: pnpm --filter @vanilla-dns/website build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to vanilla-dnschanger.github.io
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: apps/website/dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          personal_token: ${{ secrets.PAGES_TOKEN }}
+          external_repository: Vanilla-DNSChanger/vanilla-dnschanger.github.io
+          publish_branch: main
+          publish_dir: apps/website/dist
+          cname: vanilla-dnschanger.github.io

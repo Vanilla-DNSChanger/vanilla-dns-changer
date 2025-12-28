@@ -1,3 +1,5 @@
+import { VERSION } from './version';
+
 /**
  * Application URLs and endpoints
  */
@@ -33,7 +35,7 @@ export const URLS = {
 export const APP_INFO = {
   name: 'Vanilla DNS Changer',
   shortName: 'Vanilla DNS',
-  version: '1.0.0',
+  version: VERSION,
   description: 'Open-source DNS Changer for Windows, macOS, and Linux',
   author: {
     name: 'SudoLite',

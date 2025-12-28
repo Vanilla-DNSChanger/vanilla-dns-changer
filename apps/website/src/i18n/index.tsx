@@ -20,68 +20,71 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.github': 'GitHub',
     
     // Hero
+    'hero.badge': 'Open Source DNS Changer',
     'hero.title': 'Change DNS',
     'hero.titleHighlight': 'Instantly',
-    'hero.subtitle': 'Fast, secure, and beautiful DNS management for all platforms. Bypass restrictions and protect your privacy with one click.',
-    'hero.download': 'Download Now',
-    'hero.viewGithub': 'View on GitHub',
-    'hero.trustedBy': 'Trusted by developers worldwide',
+    'hero.description': 'Fast, secure, and beautiful DNS management for all platforms. Bypass restrictions and protect your privacy with one click.',
+    'hero.downloadNow': 'Download Now',
+    'hero.viewOnGithub': 'View on GitHub',
+    'hero.securePrivate': 'Secure & Private',
+    'hero.dnsServers': '40+ DNS Servers',
+    'hero.lightningFast': 'Lightning Fast',
     
     // Features
     'features.title': 'Why',
     'features.titleHighlight': 'Vanilla DNS',
     'features.subtitle': 'Everything you need to manage DNS on any platform',
-    'features.speed.title': 'Lightning Fast',
-    'features.speed.desc': 'Optimized for speed with instant DNS switching and minimal resource usage.',
-    'features.crossPlatform.title': 'Cross Platform',
-    'features.crossPlatform.desc': 'Available on Windows, macOS, Linux with CLI support for automation.',
-    'features.bypass.title': 'Bypass Restrictions',
-    'features.bypass.desc': 'Access blocked content with specialized DNS servers including Vanilla DNS.',
-    'features.privacy.title': 'Privacy First',
-    'features.privacy.desc': 'No tracking, no analytics. Your DNS queries stay private.',
-    'features.adblock.title': 'Ad Blocking',
-    'features.adblock.desc': 'Block ads and trackers at DNS level with AdGuard and other providers.',
+    'features.oneClick.title': 'One Click Setup',
+    'features.oneClick.description': 'Change your DNS with just one click. No complicated settings required.',
     'features.servers.title': '40+ DNS Servers',
-    'features.servers.desc': 'Pre-configured servers from Google, Cloudflare, Shecan, 403, and more.',
-    'features.interface.title': 'Beautiful Interface',
-    'features.interface.desc': 'Modern dark theme inspired by Kick.com with smooth animations.',
-    'features.openSource.title': 'Open Source',
-    'features.openSource.desc': 'Fully open source and free. Contribute on GitHub.',
+    'features.servers.description': 'Pre-configured servers from Google, Cloudflare, Shecan, 403, and more.',
+    'features.secure.title': 'Secure & Private',
+    'features.secure.description': 'No tracking, no analytics. Your DNS queries stay completely private.',
+    'features.darkUi.title': 'Beautiful Dark UI',
+    'features.darkUi.description': 'Modern dark theme inspired by Kick.com with smooth animations.',
+    'features.crossPlatform.title': 'Cross Platform',
+    'features.crossPlatform.description': 'Available on Windows, macOS, Linux with CLI support for automation.',
+    'features.autoUpdates.title': 'Auto Updates',
+    'features.autoUpdates.description': 'Always stay up to date with automatic updates and new DNS servers.',
     
     // Downloads
     'downloads.title': 'Download',
-    'downloads.titleHighlight': 'Vanilla DNS',
     'downloads.subtitle': 'Available for all major platforms. Choose your operating system and get started.',
     'downloads.windows': 'Windows',
-    'downloads.windowsDesc': 'Windows 10/11 (x64)',
     'downloads.macos': 'macOS',
-    'downloads.macosDesc': 'macOS 11+ (Apple Silicon)',
     'downloads.linux': 'Linux',
-    'downloads.linuxDesc': 'Ubuntu/Debian (.deb)',
     'downloads.cli': 'CLI',
-    'downloads.cliDesc': 'Command Line Interface',
+    'downloads.cliDescription': 'Command Line Interface',
     'downloads.recommended': 'Recommended',
     'downloads.download': 'Download',
-    'downloads.allReleases': 'View all releases on GitHub →',
+    'downloads.viewAllReleases': 'View all releases on GitHub',
     
     // Screenshots
     'screenshots.title': 'Beautiful',
     'screenshots.titleHighlight': 'Dark Theme',
     'screenshots.subtitle': 'Inspired by Kick.com\'s stunning design',
+    'screenshots.home.title': 'Home Screen',
+    'screenshots.home.description': 'Quick access to change DNS with one click',
+    'screenshots.explore.title': 'Explore Servers',
+    'screenshots.explore.description': 'Browse through 40+ DNS servers',
+    'screenshots.settings.title': 'Settings',
+    'screenshots.settings.description': 'Customize your experience',
     
     // Contributors
     'contributors.title': 'Made with',
     'contributors.titleHighlight': '❤️',
     'contributors.subtitle': 'Thanks to all contributors and the open source community',
+    'contributors.commits': 'commits',
+    'contributors.becomeContributor': 'Become a Contributor',
     
     // Footer
-    'footer.description': 'Fast, secure, and beautiful DNS management for all platforms.',
-    'footer.product': 'Product',
-    'footer.resources': 'Resources',
-    'footer.legal': 'Legal',
-    'footer.copyright': '© 2025 Vanilla DNS. All rights reserved.',
+    'footer.title': 'Vanilla DNS',
+    'footer.rights': 'All rights reserved.',
     'footer.madeWith': 'Made with',
     'footer.by': 'by',
+    'footer.sourceCode': 'Source Code',
+    'footer.reportIssue': 'Report Issue',
+    'footer.license': 'MIT License',
   },
   fa: {
     // Navbar
@@ -91,81 +94,82 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.github': 'گیت‌هاب',
     
     // Hero
+    'hero.badge': 'تغییر DNS متن‌باز',
     'hero.title': 'تغییر DNS',
     'hero.titleHighlight': 'فوری',
-    'hero.subtitle': 'مدیریت DNS سریع، امن و زیبا برای همه پلتفرم‌ها. دور زدن محدودیت‌ها و حفاظت از حریم خصوصی با یک کلیک.',
-    'hero.download': 'دانلود کنید',
-    'hero.viewGithub': 'مشاهده در گیت‌هاب',
-    'hero.trustedBy': 'مورد اعتماد توسعه‌دهندگان در سراسر جهان',
+    'hero.description': 'مدیریت DNS سریع، امن و زیبا برای همه پلتفرم‌ها. دور زدن محدودیت‌ها و حفاظت از حریم خصوصی با یک کلیک.',
+    'hero.downloadNow': 'دانلود کنید',
+    'hero.viewOnGithub': 'مشاهده در گیت‌هاب',
+    'hero.securePrivate': 'امن و خصوصی',
+    'hero.dnsServers': '+۴۰ سرور DNS',
+    'hero.lightningFast': 'فوق‌العاده سریع',
     
     // Features
     'features.title': 'چرا',
     'features.titleHighlight': 'وانیلا DNS',
     'features.subtitle': 'همه آنچه برای مدیریت DNS در هر پلتفرمی نیاز دارید',
-    'features.speed.title': 'فوق‌العاده سریع',
-    'features.speed.desc': 'بهینه‌سازی شده برای سرعت با تغییر فوری DNS و مصرف حداقلی منابع.',
+    'features.oneClick.title': 'تنظیم با یک کلیک',
+    'features.oneClick.description': 'DNS خود را فقط با یک کلیک تغییر دهید. نیازی به تنظیمات پیچیده نیست.',
+    'features.servers.title': '+۴۰ سرور DNS',
+    'features.servers.description': 'سرورهای از پیش تنظیم شده از Google، Cloudflare، شکن، ۴۰۳ و بیشتر.',
+    'features.secure.title': 'امن و خصوصی',
+    'features.secure.description': 'بدون ردیابی، بدون آنالیتیکس. کوئری‌های DNS شما کاملاً خصوصی می‌مانند.',
+    'features.darkUi.title': 'رابط کاربری تیره زیبا',
+    'features.darkUi.description': 'تم تیره مدرن الهام گرفته از Kick.com با انیمیشن‌های نرم.',
     'features.crossPlatform.title': 'چند پلتفرمی',
-    'features.crossPlatform.desc': 'در دسترس برای ویندوز، مک، لینوکس با پشتیبانی CLI برای اتوماسیون.',
-    'features.bypass.title': 'دور زدن محدودیت',
-    'features.bypass.desc': 'دسترسی به محتوای مسدود شده با سرورهای DNS تخصصی از جمله Vanilla DNS.',
-    'features.privacy.title': 'حریم خصوصی',
-    'features.privacy.desc': 'بدون ردیابی، بدون آنالیتیکس. کوئری‌های DNS شما خصوصی می‌مانند.',
-    'features.adblock.title': 'مسدودکننده تبلیغ',
-    'features.adblock.desc': 'مسدود کردن تبلیغات و ردیاب‌ها در سطح DNS با AdGuard و دیگر ارائه‌دهندگان.',
-    'features.servers.title': '+40 سرور DNS',
-    'features.servers.desc': 'سرورهای از پیش تنظیم شده از Google، Cloudflare، شکن، 403 و بیشتر.',
-    'features.interface.title': 'رابط کاربری زیبا',
-    'features.interface.desc': 'تم تیره مدرن الهام گرفته از Kick.com با انیمیشن‌های نرم.',
-    'features.openSource.title': 'متن‌باز',
-    'features.openSource.desc': 'کاملاً متن‌باز و رایگان. در گیت‌هاب مشارکت کنید.',
+    'features.crossPlatform.description': 'در دسترس برای ویندوز، مک، لینوکس با پشتیبانی CLI برای اتوماسیون.',
+    'features.autoUpdates.title': 'به‌روزرسانی خودکار',
+    'features.autoUpdates.description': 'همیشه با به‌روزرسانی‌های خودکار و سرورهای DNS جدید به‌روز بمانید.',
     
     // Downloads
     'downloads.title': 'دانلود',
-    'downloads.titleHighlight': 'وانیلا DNS',
     'downloads.subtitle': 'برای همه پلتفرم‌های اصلی در دسترس است. سیستم‌عامل خود را انتخاب کنید.',
     'downloads.windows': 'ویندوز',
-    'downloads.windowsDesc': 'ویندوز 10/11 (x64)',
     'downloads.macos': 'مک',
-    'downloads.macosDesc': 'macOS 11+ (Apple Silicon)',
     'downloads.linux': 'لینوکس',
-    'downloads.linuxDesc': 'اوبونتو/دبیان (.deb)',
     'downloads.cli': 'خط فرمان',
-    'downloads.cliDesc': 'رابط خط فرمان',
+    'downloads.cliDescription': 'رابط خط فرمان',
     'downloads.recommended': 'پیشنهادی',
     'downloads.download': 'دانلود',
-    'downloads.allReleases': '← مشاهده همه نسخه‌ها در گیت‌هاب',
+    'downloads.viewAllReleases': 'مشاهده همه نسخه‌ها در گیت‌هاب',
     
     // Screenshots
     'screenshots.title': 'تم تیره',
     'screenshots.titleHighlight': 'زیبا',
     'screenshots.subtitle': 'الهام گرفته از طراحی خیره‌کننده Kick.com',
+    'screenshots.home.title': 'صفحه اصلی',
+    'screenshots.home.description': 'دسترسی سریع برای تغییر DNS با یک کلیک',
+    'screenshots.explore.title': 'کاوش سرورها',
+    'screenshots.explore.description': 'مرور بیش از ۴۰ سرور DNS',
+    'screenshots.settings.title': 'تنظیمات',
+    'screenshots.settings.description': 'سفارشی‌سازی تجربه شما',
     
     // Contributors
     'contributors.title': 'ساخته شده با',
     'contributors.titleHighlight': '❤️',
     'contributors.subtitle': 'با تشکر از همه مشارکت‌کنندگان و جامعه متن‌باز',
+    'contributors.commits': 'کامیت',
+    'contributors.becomeContributor': 'مشارکت‌کننده شوید',
     
     // Footer
-    'footer.description': 'مدیریت DNS سریع، امن و زیبا برای همه پلتفرم‌ها.',
-    'footer.product': 'محصول',
-    'footer.resources': 'منابع',
-    'footer.legal': 'قوانین',
-    'footer.copyright': '© 2025 Vanilla DNS. تمامی حقوق محفوظ است.',
+    'footer.title': 'وانیلا DNS',
+    'footer.rights': 'تمامی حقوق محفوظ است.',
     'footer.madeWith': 'ساخته شده با',
     'footer.by': 'توسط',
+    'footer.sourceCode': 'کد منبع',
+    'footer.reportIssue': 'گزارش مشکل',
+    'footer.license': 'مجوز MIT',
   },
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // Default to English, only change if user explicitly selects Persian
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('vanilla-dns-lang');
       if (saved === 'en' || saved === 'fa') return saved;
-      // Auto-detect Persian
-      const browserLang = navigator.language.toLowerCase();
-      if (browserLang.startsWith('fa') || browserLang.startsWith('per')) return 'fa';
     }
-    return 'en';
+    return 'en'; // Always default to English
   });
 
   useEffect(() => {
