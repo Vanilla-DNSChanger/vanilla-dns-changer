@@ -54,8 +54,19 @@ jobs:
       - name: Deploy to vanilla-dnschanger.github.io
         uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: ${{ secrets.PAGES_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           external_repository: Vanilla-DNSChanger/vanilla-dnschanger.github.io
           publish_branch: main
           publish_dir: apps/website/dist
           cname: vanilla-dnschanger.github.io
+        env:
+          PERSONAL_TOKEN: ${{ secrets.PAGES_TOKEN }}
+        if: ${{ env.PERSONAL_TOKEN != '' }}
+
+      - name: Deploy to vanilla-dnschanger.github.io (manual)
+        if: ${{ env.PERSONAL_TOKEN == '' }}
+        run: |
+          echo "⚠️ PAGES_TOKEN secret not set. Website was built but not deployed."
+          echo "To enable automatic deployment, create a Personal Access Token and add it as PAGES_TOKEN secret."
+          echo "Built files are in apps/website/dist/"
+          ls -la apps/website/dist/
