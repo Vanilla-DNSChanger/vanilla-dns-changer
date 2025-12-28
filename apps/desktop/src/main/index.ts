@@ -46,12 +46,12 @@ const DEFAULT_CONFIG: AppConfig = {
 };
 
 // Store instance
-const store = new Store<StoreData>({
+const store = new Store({
   defaults: {
     config: DEFAULT_CONFIG,
-    pinnedServers: [],
-    customServers: [],
-    connectionHistory: [],
+    pinnedServers: [] as string[],
+    customServers: [] as any[],
+    connectionHistory: [] as any[],
   },
 });
 
@@ -89,7 +89,7 @@ function createWindow() {
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
-    const config = store.get(STORE_KEYS.CONFIG);
+    const config = store.get(STORE_KEYS.CONFIG) as AppConfig | undefined;
     if (!config?.startMinimized) {
       mainWindow?.show();
     }
@@ -97,7 +97,7 @@ function createWindow() {
 
   // Handle close
   mainWindow.on('close', (e) => {
-    const config = store.get(STORE_KEYS.CONFIG);
+    const config = store.get(STORE_KEYS.CONFIG) as AppConfig | undefined;
     if (config?.minimizeToTray && !(app as any).isQuitting) {
       e.preventDefault();
       mainWindow?.hide();

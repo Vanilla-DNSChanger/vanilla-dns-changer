@@ -58,12 +58,16 @@ const IPC_CHANNELS = {
   WINDOW_MINIMIZE: 'window:minimize',
   WINDOW_MAXIMIZE: 'window:maximize',
   WINDOW_CLOSE: 'window:close',
+  WINDOW_TOGGLE_DEVTOOLS: 'window:toggle-devtools',
   APP_VERSION: 'app:version',
   APP_OPEN_EXTERNAL: 'app:open-external',
   APP_QUIT: 'app:quit',
+  SYSTEM_PLATFORM: 'system:platform',
+  SYSTEM_IS_ELEVATED: 'system:is-elevated',
+  SYSTEM_OPEN_EXTERNAL: 'system:open-external',
 };
 
-export function registerIpcHandlers(store: Store<StoreData>, mainWindow: BrowserWindow) {
+export function registerIpcHandlers(store: Store, mainWindow: BrowserWindow) {
   const platform = getPlatform();
 
   // DNS Operations
@@ -133,39 +137,39 @@ export function registerIpcHandlers(store: Store<StoreData>, mainWindow: Browser
 
   // Config
   ipcMain.handle(IPC_CHANNELS.CONFIG_GET, () => {
-    return store.get(STORE_KEYS.CONFIG);
+    return store.get(STORE_KEYS.CONFIG) as AppConfig;
   });
 
   ipcMain.handle(IPC_CHANNELS.CONFIG_SET, (_, config: Partial<AppConfig>) => {
-    const current = store.get(STORE_KEYS.CONFIG);
+    const current = store.get(STORE_KEYS.CONFIG) as AppConfig || {};
     store.set(STORE_KEYS.CONFIG, { ...current, ...config });
-    return store.get(STORE_KEYS.CONFIG);
+    return store.get(STORE_KEYS.CONFIG) as AppConfig;
   });
 
   // Servers
   ipcMain.handle(IPC_CHANNELS.SERVERS_GET, () => {
     return {
-      pinned: store.get(STORE_KEYS.PINNED_SERVERS, []),
-      custom: store.get(STORE_KEYS.CUSTOM_SERVERS, []),
+      pinned: store.get(STORE_KEYS.PINNED_SERVERS) as string[] || [],
+      custom: store.get(STORE_KEYS.CUSTOM_SERVERS) as CustomDnsServer[] || [],
     };
   });
 
   ipcMain.handle(IPC_CHANNELS.SERVERS_ADD_CUSTOM, (_, server: CustomDnsServer) => {
-    const custom = store.get(STORE_KEYS.CUSTOM_SERVERS, []);
+    const custom = (store.get(STORE_KEYS.CUSTOM_SERVERS) as CustomDnsServer[] || []);
     custom.push(server);
     store.set(STORE_KEYS.CUSTOM_SERVERS, custom);
     return custom;
   });
 
   ipcMain.handle(IPC_CHANNELS.SERVERS_REMOVE_CUSTOM, (_, key: string) => {
-    const custom = store.get(STORE_KEYS.CUSTOM_SERVERS, []);
+    const custom = (store.get(STORE_KEYS.CUSTOM_SERVERS) as CustomDnsServer[] || []);
     const filtered = custom.filter((s: CustomDnsServer) => s.key !== key);
     store.set(STORE_KEYS.CUSTOM_SERVERS, filtered);
     return filtered;
   });
 
   ipcMain.handle(IPC_CHANNELS.SERVERS_PIN, (_, key: string) => {
-    const pinned = store.get(STORE_KEYS.PINNED_SERVERS, []);
+    const pinned = (store.get(STORE_KEYS.PINNED_SERVERS) as string[] || []);
     if (!pinned.includes(key)) {
       pinned.push(key);
       store.set(STORE_KEYS.PINNED_SERVERS, pinned);
@@ -174,7 +178,7 @@ export function registerIpcHandlers(store: Store<StoreData>, mainWindow: Browser
   });
 
   ipcMain.handle(IPC_CHANNELS.SERVERS_UNPIN, (_, key: string) => {
-    const pinned = store.get(STORE_KEYS.PINNED_SERVERS, []);
+    const pinned = (store.get(STORE_KEYS.PINNED_SERVERS) as string[] || []);
     const filtered = pinned.filter((k: string) => k !== key);
     store.set(STORE_KEYS.PINNED_SERVERS, filtered);
     return filtered;
