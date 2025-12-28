@@ -76,21 +76,18 @@ export default class Connect extends Command {
       const choices = BUILTIN_DNS_SERVERS.map((s) => ({
         name: s.key,
         message: `${s.name} ${chalk.gray(`(${s.servers.filter(Boolean).join(', ')})`)}`,
-        value: s,
       }));
 
-      const response = await prompt<{ server: DnsServer }>({
+      const response = await prompt<{ server: string }>({
         type: 'select',
         name: 'server',
         message: 'Select a DNS server',
         choices,
-        result(value: any) {
-          return BUILTIN_DNS_SERVERS.find((s) => s.key === value)!;
-        },
       });
 
-      servers = response.server.servers.filter(Boolean) as string[];
-      serverName = response.server.name;
+      const selected = BUILTIN_DNS_SERVERS.find((s) => s.key === response.server)!;
+      servers = selected.servers.filter(Boolean) as string[];
+      serverName = selected.name;
     }
 
     // Connect
