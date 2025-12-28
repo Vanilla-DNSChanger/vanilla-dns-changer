@@ -1,27 +1,36 @@
 import { motion } from 'framer-motion';
-import { Monitor, Apple, Terminal } from 'lucide-react';
+import { Monitor, Apple, Terminal, Download } from 'lucide-react';
 
+const VERSION = '1.0.0';
 const RELEASES_URL = 'https://github.com/Vanilla-DNSChanger/vanilla-dns-changer/releases';
+const DOWNLOAD_BASE = `${RELEASES_URL}/download/v${VERSION}`;
 
 const platforms = [
   {
     icon: Monitor,
     name: 'Windows',
     description: 'Windows 10/11 (x64)',
-    fileName: 'Vanilla-DNS-Setup.exe',
+    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Setup-${VERSION}.exe`,
+    fileName: 'Vanilla-DNS-Setup-1.0.0.exe',
     badge: 'Recommended',
   },
   {
     icon: Apple,
     name: 'macOS',
-    description: 'macOS 11+ (Intel & Apple Silicon)',
-    fileName: 'Vanilla-DNS.dmg',
+    description: 'macOS 11+ (Apple Silicon)',
+    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-arm64.dmg`,
+    fileName: 'Vanilla-DNS-Changer-1.0.0-arm64.dmg',
   },
   {
     icon: Monitor,
     name: 'Linux',
-    description: 'AppImage / .deb',
-    fileName: 'Vanilla-DNS.AppImage',
+    description: 'Ubuntu/Debian (.deb)',
+    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-amd64.deb`,
+    fileName: 'Vanilla-DNS-Changer-1.0.0-amd64.deb',
+    altDownload: {
+      name: 'AppImage',
+      url: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-x86_64.AppImage`,
+    },
   },
   {
     icon: Terminal,
@@ -82,14 +91,23 @@ export function Downloads() {
                   <code className="text-sm text-vanilla-green">{platform.command}</code>
                 </div>
               ) : (
-                <a
-                  href={RELEASES_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block w-full px-6 py-3 bg-vanilla-green text-black font-semibold rounded-xl btn-glow"
-                >
-                  Download
-                </a>
+                <div className="space-y-2">
+                  <a
+                    href={platform.downloadUrl}
+                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-vanilla-green text-black font-semibold rounded-xl btn-glow"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
+                  {platform.altDownload && (
+                    <a
+                      href={platform.altDownload.url}
+                      className="inline-block w-full px-4 py-2 text-sm text-vanilla-green border border-vanilla-green/30 rounded-lg hover:bg-vanilla-green/10 transition-colors"
+                    >
+                      {platform.altDownload.name}
+                    </a>
+                  )}
+                </div>
               )}
             </motion.div>
           ))}

@@ -1,18 +1,10 @@
 import { Tray, Menu, nativeImage, app, BrowserWindow } from 'electron';
 import { join } from 'path';
-import Store from 'electron-store';
-
-interface StoreData {
-  config: any;
-  pinnedServers: string[];
-  customServers: any[];
-  lastConnectedServer?: string;
-  connectionHistory: any[];
-}
+import { AppStore, StoreSchema } from './store';
 
 let isConnected = false;
 
-export function createTray(mainWindow: BrowserWindow, store: Store<StoreData>): Tray {
+export function createTray(mainWindow: BrowserWindow, store: AppStore): Tray {
   // Create tray icon
   const iconPath = join(__dirname, '../../public/logo.svg');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });

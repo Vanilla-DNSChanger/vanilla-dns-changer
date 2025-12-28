@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@vanilla-dns/shared": "workspace:*",
-    "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
     "sudo-prompt": "^9.2.1",
     "uuid": "^9.0.1"

@@ -1,22 +1,9 @@
 import { ipcMain, shell, app, BrowserWindow } from 'electron';
-import Store from 'electron-store';
 import { getPlatform } from './platforms';
 import { setTrayConnectionStatus } from './tray';
+import { AppStore, AppConfig, STORE_KEYS } from './store';
 
 // Types
-interface AppConfig {
-  language: 'en' | 'fa';
-  theme: 'dark' | 'light' | 'system';
-  startMinimized: boolean;
-  minimizeToTray: boolean;
-  autoStart: boolean;
-  showNotifications: boolean;
-  enableAnalytics: boolean;
-  autoSyncServers: boolean;
-  lastServerSync?: number;
-  selectedInterface?: string;
-}
-
 interface CustomDnsServer {
   key: string;
   name: string;
@@ -25,21 +12,6 @@ interface CustomDnsServer {
   description?: string;
   addedAt: number;
 }
-
-interface StoreData {
-  config: AppConfig;
-  pinnedServers: string[];
-  customServers: CustomDnsServer[];
-  lastConnectedServer?: string;
-  connectionHistory: any[];
-}
-
-const STORE_KEYS = {
-  CONFIG: 'config' as const,
-  PINNED_SERVERS: 'pinnedServers' as const,
-  CUSTOM_SERVERS: 'customServers' as const,
-  CONNECTION_HISTORY: 'connectionHistory' as const,
-};
 
 const IPC_CHANNELS = {
   DNS_CONNECT: 'dns:connect',
@@ -67,7 +39,7 @@ const IPC_CHANNELS = {
   SYSTEM_OPEN_EXTERNAL: 'system:open-external',
 };
 
-export function registerIpcHandlers(store: Store, mainWindow: BrowserWindow) {
+export function registerIpcHandlers(store: AppStore, mainWindow: BrowserWindow) {
   const platform = getPlatform();
 
   // DNS Operations

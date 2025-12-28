@@ -1,59 +1,12 @@
 import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell } from 'electron';
 import { join } from 'path';
-import Store from 'electron-store';
 import { autoUpdater } from 'electron-updater';
 import { registerIpcHandlers } from './ipc';
 import { createTray } from './tray';
+import { createStore, AppStore, AppConfig, STORE_KEYS, DEFAULT_CONFIG } from './store';
 
-// Types
-interface AppConfig {
-  language: 'en' | 'fa';
-  theme: 'dark' | 'light' | 'system';
-  startMinimized: boolean;
-  minimizeToTray: boolean;
-  autoStart: boolean;
-  showNotifications: boolean;
-  enableAnalytics: boolean;
-  autoSyncServers: boolean;
-  lastServerSync?: number;
-  selectedInterface?: string;
-}
-
-interface StoreData {
-  config: AppConfig;
-  pinnedServers: string[];
-  customServers: any[];
-  lastConnectedServer?: string;
-  connectionHistory: any[];
-}
-
-const STORE_KEYS = {
-  CONFIG: 'config',
-  PINNED_SERVERS: 'pinnedServers',
-  CUSTOM_SERVERS: 'customServers',
-  CONNECTION_HISTORY: 'connectionHistory',
-};
-
-const DEFAULT_CONFIG: AppConfig = {
-  language: 'en',
-  theme: 'dark',
-  startMinimized: false,
-  minimizeToTray: true,
-  autoStart: false,
-  showNotifications: true,
-  enableAnalytics: false,
-  autoSyncServers: true,
-};
-
-// Store instance
-const store = new Store({
-  defaults: {
-    config: DEFAULT_CONFIG,
-    pinnedServers: [] as string[],
-    customServers: [] as any[],
-    connectionHistory: [] as any[],
-  },
-});
+// Store instance (initialized later when app is ready)
+let store: AppStore;
 
 // Window instance
 let mainWindow: BrowserWindow | null = null;
@@ -113,14 +66,17 @@ function createWindow() {
 
 // App ready
 app.whenReady().then(async () => {
+  // Initialize store (must be after app is ready to access userData path)
+  store = createStore();
+
   // Create window
   createWindow();
 
   // Create tray
-  tray = createTray(mainWindow!, store as any);
+  tray = createTray(mainWindow!, store);
 
   // Register IPC handlers
-  registerIpcHandlers(store as any, mainWindow!);
+  registerIpcHandlers(store, mainWindow!);
 
   // Check for updates
   if (process.env.NODE_ENV !== 'development') {
