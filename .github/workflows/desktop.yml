@@ -13,10 +13,13 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
+            build_cmd: build:linux
           - os: windows-latest
             platform: win
+            build_cmd: build:win
           - os: macos-latest
             platform: mac
+            build_cmd: build:mac
 
     runs-on: ${{ matrix.os }}
 
@@ -53,32 +56,10 @@ jobs:
       - name: Build shared package
         run: pnpm --filter @vanilla-dns/shared build
 
-      - name: Build desktop app
-        run: pnpm --filter @vanilla-dns/desktop build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Electron (Linux)
-        if: matrix.platform == 'linux'
+      - name: Build Electron App
         run: |
           cd apps/desktop
-          pnpm run build:linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Electron (Windows)
-        if: matrix.platform == 'win'
-        run: |
-          cd apps/desktop
-          pnpm run build:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Electron (macOS)
-        if: matrix.platform == 'mac'
-        run: |
-          cd apps/desktop
-          pnpm run build:mac
+          pnpm run ${{ matrix.build_cmd }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -88,9 +69,8 @@ jobs:
         with:
           name: linux-builds
           path: |
-            apps/desktop/dist/*.AppImage
-            apps/desktop/dist/*.deb
-            apps/desktop/dist/*.rpm
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
 
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'win'
@@ -98,7 +78,7 @@ jobs:
         with:
           name: windows-builds
           path: |
-            apps/desktop/dist/*.exe
+            apps/desktop/release/*.exe
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'mac'
@@ -106,7 +86,7 @@ jobs:
         with:
           name: macos-builds
           path: |
-            apps/desktop/dist/*.dmg
+            apps/desktop/release/*.dmg
 
   release:
     needs: build
