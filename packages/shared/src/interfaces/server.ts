@@ -25,6 +25,8 @@ export interface DnsServer {
   country?: string;
   /** Last ping latency in ms */
   latency?: number;
+  /** Whether this is the default/recommended server */
+  isDefault?: boolean;
 }
 
 /**

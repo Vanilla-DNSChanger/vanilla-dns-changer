@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { ArrowDown, Zap, Shield, Globe } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 export function Hero() {
+  const { t, isRTL } = useI18n();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background Effects */}
@@ -40,10 +42,10 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-vanilla-green/10 border border-vanilla-green/30 rounded-full mb-8"
+          className={`inline-flex items-center gap-2 px-4 py-2 bg-vanilla-green/10 border border-vanilla-green/30 rounded-full mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}
         >
           <span className="w-2 h-2 bg-vanilla-green rounded-full animate-pulse" />
-          <span className="text-vanilla-green text-sm font-medium">Open Source DNS Changer</span>
+          <span className="text-vanilla-green text-sm font-medium">{t('hero.badge')}</span>
         </motion.div>
 
         {/* Main Title */}
@@ -53,9 +55,9 @@ export function Hero() {
           transition={{ delay: 0.3 }}
           className="text-5xl md:text-7xl font-bold mb-6"
         >
-          <span className="text-white">Change Your DNS</span>
+          <span className="text-white">{t('hero.title')}</span>
           <br />
-          <span className="text-gradient">In One Click</span>
+          <span className="text-gradient">{t('hero.titleHighlight')}</span>
         </motion.h1>
 
         {/* Description */}
@@ -65,8 +67,7 @@ export function Hero() {
           transition={{ delay: 0.4 }}
           className="text-xl text-gray-400 max-w-2xl mx-auto mb-12"
         >
-          A fast, secure, and beautiful DNS changer application for Windows, macOS, and Linux.
-          Support for 3000+ DNS servers with one-click connection.
+          {t('hero.description')}
         </motion.p>
 
         {/* CTA Buttons */}
@@ -74,14 +75,14 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 ${isRTL ? 'sm:flex-row-reverse' : ''}`}
         >
           <a
             href="#download"
-            className="px-8 py-4 bg-vanilla-green text-black font-semibold rounded-xl btn-glow flex items-center gap-2"
+            className={`px-8 py-4 bg-vanilla-green text-black font-semibold rounded-xl btn-glow flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
           >
             <Zap className="w-5 h-5" />
-            Download Now
+            {t('hero.downloadNow')}
           </a>
           <a
             href="https://github.com/Vanilla-DNSChanger/vanilla-dns-changer"
@@ -89,7 +90,7 @@ export function Hero() {
             rel="noopener noreferrer"
             className="px-8 py-4 bg-vanilla-dark-200 border border-vanilla-dark-300 text-white font-semibold rounded-xl hover:bg-vanilla-dark-300 transition-colors"
           >
-            View on GitHub
+            {t('hero.viewOnGithub')}
           </a>
         </motion.div>
 
@@ -98,19 +99,19 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="flex flex-wrap items-center justify-center gap-4"
+          className={`flex flex-wrap items-center justify-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}
         >
-          <div className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg">
+          <div className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Shield className="w-4 h-4 text-vanilla-green" />
-            <span className="text-sm text-gray-300">Secure & Private</span>
+            <span className="text-sm text-gray-300">{t('hero.securePrivate')}</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg">
+          <div className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Globe className="w-4 h-4 text-vanilla-green" />
-            <span className="text-sm text-gray-300">3000+ DNS Servers</span>
+            <span className="text-sm text-gray-300">{t('hero.dnsServers')}</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg">
+          <div className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-100 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Zap className="w-4 h-4 text-vanilla-green" />
-            <span className="text-sm text-gray-300">Lightning Fast</span>
+            <span className="text-sm text-gray-300">{t('hero.lightningFast')}</span>
           </div>
         </motion.div>
 

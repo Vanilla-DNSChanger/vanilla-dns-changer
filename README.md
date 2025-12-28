@@ -10,18 +10,31 @@
 
 <img src="apps/website/public/logo.svg" alt="Vanilla DNS Changer Logo" width="200" />
 
-A secure, fast, and beautiful DNS changer application with **3000+ DNS servers** support.
+A secure, fast, and beautiful DNS changer application with **40+ DNS servers** support.
 
 [🖥️ Desktop App](#desktop-app) • [⌨️ CLI Tool](#cli-tool) • [🌐 Website](https://vanilla-dnschanger.github.io)
 
+**[🇮🇷 نسخه فارسی](README.fa.md)**
+
 </div>
+
+---
+
+## 🌟 Default: Vanilla DNS
+
+This app comes pre-configured with **Vanilla DNS** - a smart and fast bypass DNS service from Iran.
+
+- **Primary Server:** `10.139.177.21`
+- **Secondary Server:** `10.139.177.22`
+
+For more information visit [vanillapp.ir](https://vanillapp.ir)
 
 ---
 
 ## ✨ Features
 
 - 🚀 **One-Click DNS Change** - Connect to any DNS server instantly
-- 📊 **3000+ DNS Servers** - Huge database of public DNS servers
+- 📊 **40+ DNS Servers** - Curated database of public DNS servers
 - 🎨 **Modern UI** - Beautiful dark theme with Kick-style green accents
 - 🖥️ **Cross-Platform** - Windows, macOS, and Linux support
 - 🔒 **Open Source** - Fully transparent and community-driven

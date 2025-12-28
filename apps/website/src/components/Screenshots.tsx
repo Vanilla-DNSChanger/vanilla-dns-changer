@@ -1,25 +1,27 @@
 import { motion } from 'framer-motion';
-
-// Placeholder screenshots - these would be actual app screenshots
-const screenshots = [
-  {
-    id: 1,
-    title: 'Home Screen',
-    description: 'Quick connect to your favorite DNS servers',
-  },
-  {
-    id: 2,
-    title: 'Explore Servers',
-    description: 'Browse 3000+ DNS servers by category',
-  },
-  {
-    id: 3,
-    title: 'Settings',
-    description: 'Customize your experience',
-  },
-];
+import { useI18n } from '../i18n';
 
 export function Screenshots() {
+  const { t, isRTL } = useI18n();
+
+  // Placeholder screenshots - these would be actual app screenshots
+  const screenshots = [
+    {
+      id: 1,
+      title: t('screenshots.home.title'),
+      description: t('screenshots.home.description'),
+    },
+    {
+      id: 2,
+      title: t('screenshots.explore.title'),
+      description: t('screenshots.explore.description'),
+    },
+    {
+      id: 3,
+      title: t('screenshots.settings.title'),
+      description: t('screenshots.settings.description'),
+    },
+  ];
   return (
     <section id="screenshots" className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -33,10 +35,10 @@ export function Screenshots() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-white mb-4">
-            Beautiful <span className="text-gradient">Dark Theme</span>
+            {t('screenshots.title')} <span className="text-gradient">{t('screenshots.titleHighlight')}</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Designed with a modern Kick-style dark theme. Easy on the eyes and packed with features.
+            {t('screenshots.subtitle')}
           </p>
         </motion.div>
 
@@ -80,8 +82,8 @@ export function Screenshots() {
                 <div className="absolute inset-0 bg-vanilla-green/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
-              <h3 className="text-lg font-semibold text-white">{screenshot.title}</h3>
-              <p className="text-sm text-gray-400">{screenshot.description}</p>
+              <h3 className={`text-lg font-semibold text-white ${isRTL ? 'text-right' : ''}`}>{screenshot.title}</h3>
+              <p className={`text-sm text-gray-400 ${isRTL ? 'text-right' : ''}`}>{screenshot.description}</p>
             </motion.div>
           ))}
         </div>

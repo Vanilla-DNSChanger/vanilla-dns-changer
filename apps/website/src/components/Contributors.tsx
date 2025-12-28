@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { useI18n } from '../i18n';
 
 interface Contributor {
   id: number;
@@ -13,6 +14,7 @@ interface Contributor {
 const CONTRIBUTORS_API = 'https://api.github.com/repos/Vanilla-DNSChanger/vanilla-dns-changer/contributors';
 
 export function Contributors() {
+  const { t, isRTL } = useI18n();
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +55,10 @@ export function Contributors() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-white mb-4">
-            Meet Our <span className="text-gradient">Contributors</span>
+            {t('contributors.title')} <span className="text-gradient">{t('contributors.titleHighlight')}</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Vanilla DNS is built by passionate developers. Want to contribute? Check out our GitHub!
+            {t('contributors.subtitle')}
           </p>
         </motion.div>
 
@@ -93,7 +95,7 @@ export function Contributors() {
                 <span className="text-white font-medium">@{contributor.login}</span>
                 {contributor.contributions > 0 && (
                   <span className="text-xs text-gray-500">
-                    {contributor.contributions} commits
+                    {contributor.contributions} {t('contributors.commits')}
                   </span>
                 )}
               </motion.a>
@@ -113,10 +115,10 @@ export function Contributors() {
             href="https://github.com/Vanilla-DNSChanger/vanilla-dns-changer"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-vanilla-dark-200 border border-vanilla-dark-300 rounded-xl hover:bg-vanilla-dark-300 transition-colors"
+            className={`inline-flex items-center gap-2 px-6 py-3 bg-vanilla-dark-200 border border-vanilla-dark-300 rounded-xl hover:bg-vanilla-dark-300 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
           >
-            <span>Become a Contributor</span>
-            <span className="text-vanilla-green">→</span>
+            <span>{t('contributors.becomeContributor')}</span>
+            <span className="text-vanilla-green">{isRTL ? '←' : '→'}</span>
           </a>
         </motion.div>
       </div>

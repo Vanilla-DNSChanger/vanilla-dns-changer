@@ -9,7 +9,7 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  base: '/vanilla-dns-changer/',
+  base: '/',
   build: {
     outDir: 'dist',
   },

@@ -1,6 +1,26 @@
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Vazirmatn font for Persian */
+.font-vazir {
+  font-family: 'Vazirmatn', sans-serif;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  font-family: 'Vazirmatn', sans-serif;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

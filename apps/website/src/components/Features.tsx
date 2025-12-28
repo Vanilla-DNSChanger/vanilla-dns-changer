@@ -7,41 +7,19 @@ import {
   Layers,
   RefreshCw,
 } from 'lucide-react';
+import { useI18n } from '../i18n';
 
-const features = [
-  {
-    icon: Zap,
-    title: 'One-Click Connection',
-    description: 'Connect to any DNS server instantly with just one click. No complicated settings required.',
-  },
-  {
-    icon: Globe,
-    title: '3000+ DNS Servers',
-    description: 'Access a huge database of public DNS servers from around the world, including Iranian servers.',
-  },
-  {
-    icon: Shield,
-    title: 'Secure & Private',
-    description: 'Open-source and transparent. Your privacy is protected with no tracking or data collection.',
-  },
-  {
-    icon: Palette,
-    title: 'Beautiful Dark UI',
-    description: 'Modern and sleek dark theme inspired by Kick.com. Easy on the eyes, day or night.',
-  },
-  {
-    icon: Layers,
-    title: 'Cross-Platform',
-    description: 'Works on Windows, macOS, and Linux. Use the desktop app or the command-line interface.',
-  },
-  {
-    icon: RefreshCw,
-    title: 'Auto Updates',
-    description: 'Automatic server list updates from GitHub. Always have access to the latest DNS servers.',
-  },
-];
+const featureIcons = [Zap, Globe, Shield, Palette, Layers, RefreshCw];
+const featureKeys = ['oneClick', 'servers', 'secure', 'darkUi', 'crossPlatform', 'autoUpdates'];
 
 export function Features() {
+  const { t, isRTL } = useI18n();
+
+  const features = featureKeys.map((key, index) => ({
+    icon: featureIcons[index],
+    title: t(`features.${key}.title`),
+    description: t(`features.${key}.description`),
+  }));
   return (
     <section id="features" className="py-24 relative">
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -55,11 +33,10 @@ export function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-white mb-4">
-            Why Choose <span className="text-gradient">Vanilla DNS</span>?
+            {t('features.title')} <span className="text-gradient">{t('features.titleHighlight')}</span>?
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Built with modern technologies and designed for the best user experience.
-            Everything you need to manage your DNS connections.
+            {t('features.subtitle')}
           </p>
         </motion.div>
 
@@ -67,14 +44,14 @@ export function Features() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <motion.div
-              key={feature.title}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-2xl card-hover"
+              className={`p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-2xl card-hover ${isRTL ? 'text-right' : ''}`}
             >
-              <div className="w-12 h-12 bg-vanilla-green/10 rounded-xl flex items-center justify-center mb-4">
+              <div className={`w-12 h-12 bg-vanilla-green/10 rounded-xl flex items-center justify-center mb-4 ${isRTL ? 'mr-0 ml-auto' : ''}`}>
                 <feature.icon className="w-6 h-6 text-vanilla-green" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>

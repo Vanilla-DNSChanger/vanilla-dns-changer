@@ -1,10 +1,43 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#53FC18;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3dd912;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
   <rect width="512" height="512" rx="100" fill="#0a0a0a"/>
-  <circle cx="256" cy="256" r="140" stroke="#53FC18" stroke-width="24" fill="none"/>
-  <circle cx="256" cy="256" r="80" stroke="#53FC18" stroke-width="16" fill="none" opacity="0.7"/>
-  <circle cx="256" cy="256" r="30" fill="#53FC18"/>
-  <path d="M256 116 L256 76" stroke="#53FC18" stroke-width="16" stroke-linecap="round"/>
-  <path d="M256 436 L256 396" stroke="#53FC18" stroke-width="16" stroke-linecap="round"/>
-  <path d="M116 256 L76 256" stroke="#53FC18" stroke-width="16" stroke-linecap="round"/>
-  <path d="M436 256 L396 256" stroke="#53FC18" stroke-width="16" stroke-linecap="round"/>
+  
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="200" stroke="#53FC18" stroke-width="4" fill="none" opacity="0.3"/>
+  
+  <!-- V Shape with glow -->
+  <g filter="url(#glow)">
+    <path d="M 140 120 L 256 380 L 372 120" 
+          fill="none" 
+          stroke="url(#grad1)" 
+          stroke-width="48" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Network nodes -->
+  <circle cx="140" cy="120" r="16" fill="#53FC18"/>
+  <circle cx="372" cy="120" r="16" fill="#53FC18"/>
+  <circle cx="256" cy="380" r="20" fill="#53FC18"/>
+  
+  <!-- Decorative smaller nodes -->
+  <circle cx="90" cy="180" r="6" fill="#53FC18" opacity="0.6"/>
+  <circle cx="422" cy="180" r="6" fill="#53FC18" opacity="0.6"/>
+  <circle cx="256" cy="440" r="8" fill="#53FC18" opacity="0.5"/>
+  <circle cx="180" cy="430" r="5" fill="#53FC18" opacity="0.4"/>
+  <circle cx="332" cy="430" r="5" fill="#53FC18" opacity="0.4"/>
 </svg>

@@ -5,10 +5,13 @@ import { Downloads } from './components/Downloads';
 import { Screenshots } from './components/Screenshots';
 import { Contributors } from './components/Contributors';
 import { Footer } from './components/Footer';
+import { I18nProvider, useI18n } from './i18n';
 
-function App() {
+function AppContent() {
+  const { isRTL } = useI18n();
+  
   return (
-    <div className="min-h-screen bg-vanilla-dark">
+    <div className={`min-h-screen bg-vanilla-dark ${isRTL ? 'font-vazir' : ''}`}>
       <Navbar />
       <main>
         <Hero />
@@ -19,6 +22,14 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <I18nProvider>
+      <AppContent />
+    </I18nProvider>
   );
 }
 

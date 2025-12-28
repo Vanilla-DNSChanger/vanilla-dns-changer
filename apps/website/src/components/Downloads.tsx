@@ -1,47 +1,49 @@
 import { motion } from 'framer-motion';
 import { Monitor, Apple, Terminal, Download } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 const VERSION = '1.0.1';
 const RELEASES_URL = 'https://github.com/Vanilla-DNSChanger/vanilla-dns-changer/releases';
 const DOWNLOAD_BASE = `${RELEASES_URL}/download/v${VERSION}`;
 
-const platforms = [
-  {
-    icon: Monitor,
-    name: 'Windows',
-    description: 'Windows 10/11 (x64)',
-    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Setup-${VERSION}.exe`,
-    fileName: 'Vanilla-DNS-Setup-1.0.0.exe',
-    badge: 'Recommended',
-  },
-  {
-    icon: Apple,
-    name: 'macOS',
-    description: 'macOS 11+ (Apple Silicon)',
-    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-arm64.dmg`,
-    fileName: 'Vanilla-DNS-Changer-1.0.0-arm64.dmg',
-  },
-  {
-    icon: Monitor,
-    name: 'Linux',
-    description: 'Ubuntu/Debian (.deb)',
-    downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-amd64.deb`,
-    fileName: 'Vanilla-DNS-Changer-1.0.0-amd64.deb',
-    altDownload: {
-      name: 'AppImage',
-      url: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-x86_64.AppImage`,
-    },
-  },
-  {
-    icon: Terminal,
-    name: 'CLI',
-    description: 'Command Line Interface',
-    command: 'npm install -g @vanilla-dns/cli',
-    isCli: true,
-  },
-];
-
 export function Downloads() {
+  const { t, isRTL } = useI18n();
+
+  const platforms = [
+    {
+      icon: Monitor,
+      name: t('downloads.windows'),
+      description: 'Windows 10/11 (x64)',
+      downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Setup-${VERSION}.exe`,
+      fileName: `Vanilla-DNS-Setup-${VERSION}.exe`,
+      badge: t('downloads.recommended'),
+    },
+    {
+      icon: Apple,
+      name: t('downloads.macos'),
+      description: 'macOS 11+ (Apple Silicon)',
+      downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-arm64.dmg`,
+      fileName: `Vanilla-DNS-Changer-${VERSION}-arm64.dmg`,
+    },
+    {
+      icon: Monitor,
+      name: t('downloads.linux'),
+      description: 'Ubuntu/Debian (.deb)',
+      downloadUrl: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-amd64.deb`,
+      fileName: `Vanilla-DNS-Changer-${VERSION}-amd64.deb`,
+      altDownload: {
+        name: 'AppImage',
+        url: `${DOWNLOAD_BASE}/Vanilla-DNS-Changer-${VERSION}-x86_64.AppImage`,
+      },
+    },
+    {
+      icon: Terminal,
+      name: t('downloads.cli'),
+      description: t('downloads.cliDescription'),
+      command: 'npm install -g @vanilla-dns/cli',
+      isCli: true,
+    },
+  ];
   return (
     <section id="download" className="py-24 relative">
       <div className="absolute inset-0 bg-radial opacity-50" />
@@ -55,10 +57,10 @@ export function Downloads() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-white mb-4">
-            Download <span className="text-gradient">Vanilla DNS</span>
+            {t('downloads.title')} <span className="text-gradient">Vanilla DNS</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Available for all major platforms. Choose your operating system and get started.
+            {t('downloads.subtitle')}
           </p>
         </motion.div>
 
@@ -94,10 +96,10 @@ export function Downloads() {
                 <div className="space-y-2">
                   <a
                     href={platform.downloadUrl}
-                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-vanilla-green text-black font-semibold rounded-xl btn-glow"
+                    className={`inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-vanilla-green text-black font-semibold rounded-xl btn-glow ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
                     <Download className="w-4 h-4" />
-                    Download
+                    {t('downloads.download')}
                   </a>
                   {platform.altDownload && (
                     <a
@@ -125,9 +127,9 @@ export function Downloads() {
             href={RELEASES_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-vanilla-green hover:underline"
+            className={`text-vanilla-green hover:underline inline-flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
           >
-            View all releases on GitHub →
+            {t('downloads.viewAllReleases')} {isRTL ? '←' : '→'}
           </a>
         </motion.div>
       </div>

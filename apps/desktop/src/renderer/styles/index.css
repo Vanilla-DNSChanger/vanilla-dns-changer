@@ -129,3 +129,79 @@
   @apply border-vanilla-green-400 bg-vanilla-dark-50;
   box-shadow: 0 0 0 1px #53FC18;
 }
+
+/* Light theme */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e5e5e5;
+  --text-primary: #0a0a0a;
+  --text-secondary: #525252;
+  --border-color: #d4d4d4;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+.light .bg-vanilla-dark {
+  background-color: var(--bg-primary);
+}
+
+.light .bg-vanilla-dark-50 {
+  background-color: var(--bg-secondary);
+}
+
+.light .bg-vanilla-dark-100 {
+  background-color: var(--bg-secondary);
+}
+
+.light .bg-vanilla-dark-200 {
+  background-color: var(--bg-tertiary);
+}
+
+.light .text-white {
+  color: var(--text-primary);
+}
+
+.light .text-gray-400 {
+  color: var(--text-secondary);
+}
+
+.light .border-vanilla-dark-300 {
+  border-color: var(--border-color);
+}
+
+/* RTL specific styles */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Vazirmatn font for Persian */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
+.font-vazir {
+  font-family: 'Vazirmatn', sans-serif;
+}
