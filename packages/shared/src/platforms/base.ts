@@ -57,12 +57,6 @@ export abstract class Platform implements IPlatform {
   abstract isElevated(): Promise<boolean>;
 
   /**
-   * Execute a command with elevated privileges
-   * @param command - Command to execute
-   */
-  protected abstract executeElevated(command: string): Promise<{ stdout: string; stderr: string }>;
-
-  /**
    * Execute a command normally
    * @param command - Command to execute
    */
