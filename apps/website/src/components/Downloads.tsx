@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Monitor, Apple, Terminal, Download } from 'lucide-react';
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 const RELEASES_URL = 'https://github.com/Vanilla-DNSChanger/vanilla-dns-changer/releases';
 const DOWNLOAD_BASE = `${RELEASES_URL}/download/v${VERSION}`;
 
