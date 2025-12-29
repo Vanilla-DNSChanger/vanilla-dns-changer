@@ -7,35 +7,34 @@
     "url": "https://x.com/sudolite"
   },
   "license": "MIT",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./interfaces": {
       "types": "./dist/interfaces/index.d.ts",
-      "import": "./dist/interfaces/index.mjs",
-      "require": "./dist/interfaces/index.js"
+      "import": "./dist/interfaces/index.js",
+      "require": "./dist/interfaces/index.cjs"
     },
     "./validators": {
       "types": "./dist/validators/index.d.ts",
-      "import": "./dist/validators/index.mjs",
-      "require": "./dist/validators/index.js"
+      "import": "./dist/validators/index.js",
+      "require": "./dist/validators/index.cjs"
     },
     "./constants": {
       "types": "./dist/constants/index.d.ts",
-      "import": "./dist/constants/index.mjs",
-      "require": "./dist/constants/index.js"
+      "import": "./dist/constants/index.js",
+      "require": "./dist/constants/index.cjs"
     },
     "./platforms": {
       "types": "./dist/platforms/index.d.ts",
-      "import": "./dist/platforms/index.mjs",
-      "require": "./dist/platforms/index.js"
+      "import": "./dist/platforms/index.js",
+      "require": "./dist/platforms/index.cjs"
     }
   },
   "files": [
