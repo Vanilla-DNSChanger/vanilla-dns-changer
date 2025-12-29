@@ -23,7 +23,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   };
 
   return (
-    <div className={`w-16 bg-vanilla-dark-100 flex flex-col items-center py-4 ${rtl ? 'border-l border-vanilla-dark-300' : 'border-r border-vanilla-dark-300'}`}>
+    <div className={`w-16 bg-vanilla-dark-100 flex flex-col items-center py-4 ${rtl ? 'border-l border-vanilla-dark-300 order-1' : 'border-r border-vanilla-dark-300 order-none'}`}>
       {/* Navigation Items */}
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (

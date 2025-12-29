@@ -131,10 +131,8 @@ function App() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - order changes based on RTL */}
-        <div className={rtl ? 'order-last' : 'order-first'}>
-          <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-        </div>
+        {/* Sidebar */}
+        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-6">

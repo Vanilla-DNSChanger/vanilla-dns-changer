@@ -77,14 +77,13 @@ export function ExplorePage() {
       <div className="flex gap-4">
         {/* Search */}
         <div className="flex-1 relative">
-          <Search className={`absolute ${rtl ? 'left-4' : 'left-4'} top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500`} />
+          <Search className={`absolute ${rtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500`} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t.servers.search}
-            className="w-full pl-12 pr-4 py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors"
-            dir={rtl ? 'rtl' : 'ltr'}
+            className={`w-full ${rtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors`}
           />
         </div>
       </div>
