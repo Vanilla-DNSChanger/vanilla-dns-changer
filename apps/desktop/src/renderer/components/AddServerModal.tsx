@@ -76,7 +76,7 @@ export function AddServerModal({ isOpen, onClose, onAdd }: AddServerModalProps) 
       {/* Modal */}
       <div className="relative bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-2xl w-full max-w-md p-6 shadow-2xl" dir={rtl ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className={`flex items-center justify-between mb-6 ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-white">{t.servers.addCustom || 'Add Custom DNS'}</h2>
           <button
             onClick={handleClose}
@@ -102,21 +102,21 @@ export function AddServerModal({ isOpen, onClose, onAdd }: AddServerModalProps) 
           <div className="space-y-4">
             {/* Name */}
             <div>
-              <label className={`block text-sm font-medium text-gray-300 mb-1 ${rtl ? 'text-right' : ''}`}>
-                {t.servers.name || 'Server Name'}
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                {t.servers.serverName || 'Server Name'}
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="My Custom DNS"
-                className={`w-full px-4 py-2 bg-vanilla-dark-200 border border-vanilla-dark-300 rounded-lg text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors ${rtl ? 'text-right' : ''}`}
+                className="w-full px-4 py-2 bg-vanilla-dark-200 border border-vanilla-dark-300 rounded-lg text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors"
               />
             </div>
 
             {/* Primary DNS */}
             <div>
-              <label className={`block text-sm font-medium text-gray-300 mb-1 ${rtl ? 'text-right' : ''}`}>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 {t.servers.primaryDns || 'Primary DNS'}
               </label>
               <input
@@ -131,8 +131,8 @@ export function AddServerModal({ isOpen, onClose, onAdd }: AddServerModalProps) 
 
             {/* Secondary DNS */}
             <div>
-              <label className={`block text-sm font-medium text-gray-300 mb-1 ${rtl ? 'text-right' : ''}`}>
-                {t.servers.secondaryDns || 'Secondary DNS'} <span className="text-gray-500">({t.settings.optional || 'optional'})</span>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                {t.servers.secondaryDns || 'Secondary DNS'}
               </label>
               <input
                 type="text"
@@ -146,17 +146,17 @@ export function AddServerModal({ isOpen, onClose, onAdd }: AddServerModalProps) 
           </div>
 
           {/* Actions */}
-          <div className={`flex gap-3 mt-6 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className="flex gap-3 mt-6">
             <button
               type="button"
               onClick={handleClose}
               className="flex-1 px-4 py-2 bg-vanilla-dark-200 text-white rounded-lg hover:bg-vanilla-dark-300 transition-colors"
             >
-              {t.settings.cancel || 'Cancel'}
+              {t.servers.cancel || 'Cancel'}
             </button>
             <button
               type="submit"
-              className={`flex-1 px-4 py-2 bg-vanilla-green-400 text-black font-medium rounded-lg hover:bg-vanilla-green-hover transition-colors flex items-center justify-center gap-2 ${rtl ? 'flex-row-reverse' : ''}`}
+              className="flex-1 px-4 py-2 bg-vanilla-green-400 text-black font-medium rounded-lg hover:bg-vanilla-green-hover transition-colors flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
               {t.servers.add || 'Add Server'}

@@ -139,35 +139,53 @@ export class WindowsPlatform extends Platform {
    */
   private async isDnsSetStatically(interfaceName: string): Promise<boolean> {
     try {
-      // Method 1: Check via WMI if DNS is obtained from DHCP
-      const { stdout } = await this.executePowerShell(
-        `Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.Description -like "*${interfaceName}*" -or $_.Index -eq (Get-NetAdapter -Name "${interfaceName}" -ErrorAction SilentlyContinue).InterfaceIndex } | Select-Object -ExpandProperty DHCPEnabled`
-      );
-      
-      // If DHCP is enabled, we need to check if DNS is also from DHCP or manually set
-      // Method 2: Check the interface configuration directly
-      const { stdout: dnsConfigStdout } = await this.executePowerShell(
-        `Get-DnsClient -InterfaceAlias "${interfaceName}" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty RegisterThisConnectionsAddress`
-      );
-
-      // Method 3: Check netsh to see if DNS is "Statically Configured" vs "DHCP"
+      // Primary method: Use netsh to check DNS configuration
+      // This is the most reliable way to determine if DNS is static or DHCP
       const { stdout: netshOutput } = await this.execute(
         `netsh interface ip show dns name="${interfaceName}"`
       );
       
-      // Parse netsh output to check if DNS is statically configured
-      const lines = netshOutput.toLowerCase();
-      if (lines.includes('statically configured') || lines.includes('static')) {
+      // Parse netsh output line by line
+      const lines = netshOutput.split('\n');
+      for (const line of lines) {
+        const lowerLine = line.toLowerCase().trim();
+        
+        // Check for static configuration indicators
+        if (lowerLine.includes('statically configured') || 
+            lowerLine.includes('static dns') ||
+            (lowerLine.includes('dns servers configured') && lowerLine.includes('static'))) {
+          return true;
+        }
+        
+        // Check for DHCP configuration indicators
+        if (lowerLine.includes('configured through dhcp') || 
+            lowerLine.includes('dhcp enabled') ||
+            lowerLine.includes('obtained automatically') ||
+            lowerLine.includes('register with which suffix')) {
+          // "Register with which suffix" without "statically" means DHCP
+          if (!lowerLine.includes('static')) {
+            continue; // Check more lines
+          }
+        }
+        
+        // Direct indicator: "Statically Configured DNS Servers"
+        if (lowerLine.includes('statically') && lowerLine.includes('dns')) {
+          return true;
+        }
+      }
+      
+      // If the output contains IP addresses but no "DHCP" mention, it might be static
+      // Let's also check if there are any DNS servers at all
+      const hasIpAddresses = /\d+\.\d+\.\d+\.\d+/.test(netshOutput);
+      const mentionsDhcp = netshOutput.toLowerCase().includes('dhcp');
+      
+      if (hasIpAddresses && !mentionsDhcp) {
         return true;
       }
-      if (lines.includes('dhcp') || lines.includes('configured through dhcp')) {
-        return false;
-      }
 
-      // If we can't determine from netsh, assume DNS servers indicate static config
-      // (only if they are known DNS providers, not typical DHCP-assigned DNS)
       return false;
-    } catch {
+    } catch (error) {
+      console.error('Error checking DNS static status:', error);
       return false;
     }
   }

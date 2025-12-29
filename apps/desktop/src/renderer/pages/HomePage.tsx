@@ -91,18 +91,18 @@ export function HomePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Connection Status Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-2xl p-6"
       >
-        <div className={`flex items-center justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between">
           {/* Status */}
-          <div className={`flex items-center gap-4 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center gap-4">
             <div
-              className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${
                 status.isConnected
                   ? 'bg-vanilla-green-400/20 text-vanilla-green-400'
                   : 'bg-gray-500/20 text-gray-500'
@@ -114,11 +114,11 @@ export function HomePage() {
                 <WifiOff className="w-8 h-8" />
               )}
             </div>
-            <div className={rtl ? 'text-right' : ''}>
+            <div>
               <h2 className="text-xl font-semibold text-white">
                 {status.isConnected ? t.home.connected : t.home.disconnected}
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-400" dir="ltr">
                 {status.isConnected && status.activeDns.length > 0
                   ? `${t.home.currentDns}: ${status.activeDns.join(', ')}`
                   : t.home.noDns}
@@ -130,7 +130,7 @@ export function HomePage() {
           </div>
 
           {/* Actions */}
-          <div className={`flex items-center gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center gap-3">
             {/* Flush Button */}
             <button
               onClick={handleFlush}
@@ -144,7 +144,7 @@ export function HomePage() {
             <button
               onClick={status.isConnected ? handleDisconnect : handleConnect}
               disabled={isConnecting || (!status.isConnected && !selectedServer)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${rtl ? 'flex-row-reverse' : ''} ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                 status.isConnected
                   ? 'bg-red-500 hover:bg-red-600 text-white'
                   : 'bg-vanilla-green-400 hover:bg-vanilla-green-hover text-black disabled:opacity-50 disabled:cursor-not-allowed'
@@ -178,7 +178,7 @@ export function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <div className={`flex items-center gap-2 mb-3 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center gap-2 mb-3">
             <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
             <h3 className="text-lg font-semibold text-white">{t.home.recommendedServer}</h3>
           </div>
@@ -190,26 +190,26 @@ export function HomePage() {
                 : 'border-vanilla-dark-300 bg-vanilla-dark-100 hover:border-vanilla-green-400/50'
             }`}
           >
-            <div className={`flex items-center justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
-              <div className={`flex items-center gap-4 ${rtl ? 'flex-row-reverse' : ''}`}>
-                <div className="w-12 h-12 rounded-xl bg-vanilla-green-400/20 flex items-center justify-center">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-vanilla-green-400/20 flex items-center justify-center flex-shrink-0">
                   <span className="text-vanilla-green-400 text-xl font-bold">V</span>
                 </div>
-                <div className={rtl ? 'text-right' : ''}>
-                  <div className={`flex items-center gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-white">{vanillaServer.name}</p>
                     <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-500 text-xs rounded-full">
                       {t.home.recommendedServer}
                     </span>
                   </div>
                   <p className="text-sm text-gray-400">{vanillaServer.description}</p>
-                  <p className="text-xs text-gray-500 font-mono mt-1">
+                  <p className="text-xs text-gray-500 font-mono mt-1" dir="ltr">
                     {vanillaServer.servers.join(' / ')}
                   </p>
                 </div>
               </div>
               {selectedServer?.key === vanillaServer.key && (
-                <div className="w-3 h-3 bg-vanilla-green-400 rounded-full" />
+                <div className="w-3 h-3 bg-vanilla-green-400 rounded-full flex-shrink-0" />
               )}
             </div>
           </div>
@@ -223,16 +223,16 @@ export function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-vanilla-green-400/10 border border-vanilla-green-400/30 rounded-xl p-4"
         >
-          <p className={`text-sm text-vanilla-green-400 mb-2 ${rtl ? 'text-right' : ''}`}>
+          <p className="text-sm text-vanilla-green-400 mb-2">
             {t.home.selectServer}:
           </p>
-          <div className={`flex items-center gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
-            <div className="w-8 h-8 rounded-lg bg-vanilla-green-400/20 flex items-center justify-center text-vanilla-green-400 font-bold">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-vanilla-green-400/20 flex items-center justify-center text-vanilla-green-400 font-bold flex-shrink-0">
               {selectedServer.name.charAt(0)}
             </div>
-            <div className={rtl ? 'text-right' : ''}>
+            <div>
               <p className="font-medium text-white">{selectedServer.name}</p>
-              <p className="text-xs text-gray-400 font-mono">
+              <p className="text-xs text-gray-400 font-mono" dir="ltr">
                 {selectedServer.servers.filter(Boolean).join(' / ')}
               </p>
             </div>
@@ -242,7 +242,7 @@ export function HomePage() {
 
       {/* Quick Connect */}
       <div>
-        <div className={`flex items-center justify-between mb-4 ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">{t.home.quickConnect}</h3>
           <button
             onClick={() => setShowAddModal(true)}
@@ -269,7 +269,7 @@ export function HomePage() {
       {/* Pinned Servers */}
       {pinnedServers.length > 0 && (
         <div>
-          <h3 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>
+          <h3 className="text-lg font-semibold text-white mb-4">
             {t.servers.pinned}
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -292,7 +292,7 @@ export function HomePage() {
       {/* Custom Servers */}
       {customServers.length > 0 && (
         <div>
-          <h3 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>
+          <h3 className="text-lg font-semibold text-white mb-4">
             {t.servers.custom}
           </h3>
           <div className="grid grid-cols-2 gap-3">

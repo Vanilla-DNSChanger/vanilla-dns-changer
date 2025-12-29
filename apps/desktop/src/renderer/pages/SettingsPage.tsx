@@ -18,7 +18,7 @@ import { useStore } from '../store';
 import { useTranslation } from '../hooks';
 import { URLS, APP_INFO } from '@vanilla-dns/shared';
 import type { AppConfig, NetworkInterface } from '@vanilla-dns/shared';
-import logoSvg from '../../assets/logo.svg';
+import logoSvg from '../assets/logo.svg';
 
 export function SettingsPage() {
   const { config, setConfig } = useStore();
@@ -68,17 +68,22 @@ export function SettingsPage() {
     description: string;
     children: React.ReactNode;
   }) => (
-    <div className={`flex items-center justify-between p-4 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl ${rtl ? 'flex-row-reverse' : ''}`}>
-      <div className={`flex items-center gap-4 ${rtl ? 'flex-row-reverse' : ''}`}>
-        <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center">
+    <div 
+      className="flex items-center justify-between p-4 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl"
+      dir={rtl ? 'rtl' : 'ltr'}
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center flex-shrink-0">
           <Icon className="w-5 h-5 text-vanilla-green-400" />
         </div>
-        <div className={rtl ? 'text-right' : ''}>
+        <div>
           <h3 className="font-medium text-white">{title}</h3>
           <p className="text-sm text-gray-400">{description}</p>
         </div>
       </div>
-      {children}
+      <div className="flex-shrink-0">
+        {children}
+      </div>
     </div>
   );
 
@@ -91,15 +96,14 @@ export function SettingsPage() {
   }) => (
     <button
       onClick={() => onChange(!checked)}
+      dir="ltr"
       className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
         checked ? 'bg-vanilla-green-400' : 'bg-vanilla-dark-300'
       }`}
     >
       <div
         className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${
-          rtl 
-            ? (checked ? 'translate-x-1' : 'translate-x-7')
-            : (checked ? 'translate-x-7' : 'translate-x-1')
+          checked ? 'translate-x-7' : 'translate-x-1'
         }`}
       />
     </button>
@@ -266,28 +270,28 @@ export function SettingsPage() {
       >
         <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.about}</h2>
 
-        <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl">
-          <div className={`flex items-center gap-4 mb-4 ${rtl ? 'flex-row-reverse' : ''}`}>
-            <img src={logoSvg} alt="Logo" className="w-12 h-12" />
-            <div className={rtl ? 'text-right' : ''}>
+        <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl" dir={rtl ? 'rtl' : 'ltr'}>
+          <div className="flex items-center gap-4 mb-4">
+            <img src={logoSvg} alt="Logo" className="w-12 h-12 flex-shrink-0" />
+            <div>
               <h3 className="text-xl font-bold text-white">{t.app.name}</h3>
               <p className="text-gray-400">{t.settings.version} {APP_INFO.version}</p>
             </div>
           </div>
 
-          <p className={`text-gray-400 mb-4 ${rtl ? 'text-right' : ''}`}>{t.app.tagline}</p>
+          <p className="text-gray-400 mb-4">{t.app.tagline}</p>
 
-          <div className={`flex gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className="flex gap-3">
             <button
               onClick={() => openExternal(URLS.GITHUB_REPO)}
-              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors ${rtl ? 'flex-row-reverse' : ''}`}
+              className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
               {t.settings.github}
             </button>
             <button
               onClick={() => openExternal(URLS.WEBSITE)}
-              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors ${rtl ? 'flex-row-reverse' : ''}`}
+              className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
               {t.settings.website}

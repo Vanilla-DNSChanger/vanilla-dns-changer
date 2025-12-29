@@ -64,9 +64,9 @@ export function ExplorePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className={rtl ? 'text-right' : ''}>
+      <div>
         <h1 className="text-2xl font-bold text-white">{t.servers.title}</h1>
         <p className="text-gray-400 mt-1">
           {servers.length}+ {t.servers.all}
@@ -83,14 +83,13 @@ export function ExplorePage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t.servers.search}
-            className={`w-full ${rtl ? 'pr-12 pl-4 text-right' : 'pl-12 pr-4'} py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors`}
-            dir={rtl ? 'rtl' : 'ltr'}
+            className={`w-full ${rtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors`}
           />
         </div>
       </div>
 
       {/* Categories */}
-      <div className={`flex gap-2 flex-wrap ${rtl ? 'flex-row-reverse' : ''}`}>
+      <div className="flex gap-2 flex-wrap">
         {DNS_CATEGORIES.map((category) => (
           <button
             key={category.key}
@@ -107,7 +106,7 @@ export function ExplorePage() {
       </div>
 
       {/* Results Count */}
-      <div className={`flex items-center justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
+      <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">
           {filteredServers.length} {t.servers.all}
         </p>
@@ -128,7 +127,7 @@ export function ExplorePage() {
             className="relative"
           >
             {server.key === 'vanilla' && (
-              <div className={`absolute -top-2 ${rtl ? 'left-2' : 'right-2'} z-10 flex items-center gap-1 px-2 py-0.5 bg-yellow-500 text-black text-xs font-bold rounded-full`}>
+              <div className={`absolute -top-2 ${rtl ? 'left-2' : 'right-2'} z-10 flex items-center gap-1 px-2 py-0.5 bg-yellow-500 text-black text-xs font-bold rounded-full`} dir="ltr">
                 <Star className="w-3 h-3" />
                 {t.home.recommendedServer}
               </div>

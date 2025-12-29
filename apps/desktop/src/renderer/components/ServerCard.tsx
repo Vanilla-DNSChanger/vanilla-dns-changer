@@ -64,34 +64,30 @@ export function ServerCard({
       className={`server-card ${isSelected ? 'selected' : ''} card-hover`}
       dir={rtl ? 'rtl' : 'ltr'}
     >
-      <div className={`flex items-start justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
+      <div className="flex items-start justify-between">
         {/* Server Info */}
-        <div className={`flex items-center gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center text-lg">
-            {server.avatar ? (
-              <span>{server.name.charAt(0).toUpperCase()}</span>
-            ) : (
-              <span>{server.name.charAt(0).toUpperCase()}</span>
-            )}
+          <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center text-lg flex-shrink-0">
+            <span>{server.name.charAt(0).toUpperCase()}</span>
           </div>
 
           {/* Name and Servers */}
-          <div className={rtl ? 'text-right' : ''}>
-            <h3 className={`font-medium text-white flex items-center gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <div>
+            <h3 className="font-medium text-white flex items-center gap-2 flex-wrap">
               {server.name}
               {server.country && (
                 <span className="text-xs text-gray-500">{server.country}</span>
               )}
             </h3>
-            <p className="text-xs text-gray-500 font-mono">
+            <p className="text-xs text-gray-500 font-mono" dir="ltr">
               {server.servers.filter(Boolean).join(' / ')}
             </p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className={`flex items-center gap-1 ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center gap-1 flex-shrink-0" dir="ltr">
           {/* Latency */}
           <button
             onClick={handlePing}
@@ -136,7 +132,7 @@ export function ServerCard({
 
       {/* Tags */}
       {server.tags && server.tags.length > 0 && (
-        <div className={`flex flex-wrap gap-1 mt-3 ${rtl ? 'flex-row-reverse' : ''}`}>
+        <div className="flex flex-wrap gap-1 mt-3">
           {server.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
