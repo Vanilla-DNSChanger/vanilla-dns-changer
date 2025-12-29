@@ -11,27 +11,77 @@ import {
 const execAsync = promisify(exec);
 
 /**
+ * Network interface info from wmic/netsh
+ */
+interface WinNetworkInterface {
+  name: string;
+  status: string;
+  type: string;
+}
+
+/**
  * Windows Platform implementation for CLI
+ * Uses netsh for DNS operations
  */
 export class WindowsPlatform extends Platform {
   readonly type = 'windows' as const;
-  private selectedInterface: string = 'Wi-Fi';
+  private selectedInterface: string | null = null;
+
+  /**
+   * Get the active network interface with internet connection
+   */
+  private async getActiveInterface(): Promise<string> {
+    if (this.selectedInterface) {
+      return this.selectedInterface;
+    }
+
+    try {
+      // Try to get active interface using route command
+      const { stdout } = await this.execute(
+        'powershell -NoProfile -Command "Get-NetRoute -DestinationPrefix 0.0.0.0/0 | Select-Object -ExpandProperty InterfaceAlias | Select-Object -First 1"'
+      );
+      
+      const interfaceName = stdout.trim();
+      if (interfaceName) {
+        this.selectedInterface = interfaceName;
+        return interfaceName;
+      }
+    } catch {}
+
+    // Fallback: try common interface names
+    const commonNames = ['Wi-Fi', 'Ethernet', 'Local Area Connection'];
+    for (const name of commonNames) {
+      try {
+        const { stdout } = await this.execute(`netsh interface show interface name="${name}"`);
+        if (stdout.includes('Connected')) {
+          this.selectedInterface = name;
+          return name;
+        }
+      } catch {}
+    }
+
+    throw new Error('No active network interface found');
+  }
 
   async setDns(servers: string[]): Promise<DnsOperationResult> {
     try {
+      const interfaceName = await this.getActiveInterface();
       const [primary, secondary] = servers;
 
       // Set primary DNS
       await this.executeElevated(
-        `netsh interface ip set dns name="${this.selectedInterface}" static ${primary}`
+        `netsh interface ip set dns name="${interfaceName}" static ${primary}`
       );
 
       // Set secondary DNS if provided
       if (secondary) {
         await this.executeElevated(
-          `netsh interface ip add dns name="${this.selectedInterface}" ${secondary} index=2`
+          `netsh interface ip add dns name="${interfaceName}" ${secondary} index=2`
         );
       }
+
+      // Flush DNS cache
+      await this.flushDnsCache();
 
       return { success: true, message: 'DNS servers updated successfully' };
     } catch (error: any) {
@@ -41,9 +91,14 @@ export class WindowsPlatform extends Platform {
 
   async clearDns(): Promise<DnsOperationResult> {
     try {
+      const interfaceName = await this.getActiveInterface();
+
       await this.executeElevated(
-        `netsh interface ip set dns name="${this.selectedInterface}" dhcp`
+        `netsh interface ip set dns name="${interfaceName}" dhcp`
       );
+
+      await this.flushDnsCache();
+
       return { success: true, message: 'DNS reset to DHCP' };
     } catch (error: any) {
       return { success: false, error: error.message };
@@ -52,8 +107,9 @@ export class WindowsPlatform extends Platform {
 
   async getActiveDns(): Promise<string[]> {
     try {
+      const interfaceName = await this.getActiveInterface();
       const { stdout } = await this.execute(
-        `netsh interface ip show dns "${this.selectedInterface}"`
+        `netsh interface ip show dns "${interfaceName}"`
       );
 
       const dnsServers: string[] = [];
@@ -61,7 +117,7 @@ export class WindowsPlatform extends Platform {
 
       for (const line of lines) {
         const match = line.match(/(\d+\.\d+\.\d+\.\d+)/);
-        if (match) {
+        if (match && !dnsServers.includes(match[1])) {
           dnsServers.push(match[1]);
         }
       }
@@ -73,11 +129,26 @@ export class WindowsPlatform extends Platform {
   }
 
   async getStatus(): Promise<DnsStatus> {
-    const activeDns = await this.getActiveDns();
-    return {
-      isConnected: activeDns.length > 0 && !activeDns.includes('0.0.0.0'),
-      activeDns,
-    };
+    try {
+      const activeDns = await this.getActiveDns();
+      const interfaceName = await this.getActiveInterface();
+      
+      // Check if DNS is static
+      const { stdout } = await this.execute(
+        `netsh interface ip show dns "${interfaceName}"`
+      );
+      const isStatic = stdout.toLowerCase().includes('statically configured');
+      
+      return {
+        isConnected: isStatic && activeDns.length > 0,
+        activeDns,
+      };
+    } catch {
+      return {
+        isConnected: false,
+        activeDns: [],
+      };
+    }
   }
 
   async getNetworkInterfaces(): Promise<NetworkInterface[]> {
@@ -89,7 +160,7 @@ export class WindowsPlatform extends Platform {
       for (const line of lines) {
         const parts = line.trim().split(/\s{2,}/);
         if (parts.length >= 4) {
-          const [adminState, state, , name] = parts;
+          const [adminState, state, type, name] = parts;
           if (name && adminState === 'Enabled') {
             interfaces.push({
               name,
@@ -142,6 +213,10 @@ export class WindowsPlatform extends Platform {
     }
   }
 
+  setInterface(name: string): void {
+    this.selectedInterface = name;
+  }
+
   protected async executeElevated(
     command: string
   ): Promise<{ stdout: string; stderr: string }> {
@@ -161,6 +236,6 @@ export class WindowsPlatform extends Platform {
   protected async execute(
     command: string
   ): Promise<{ stdout: string; stderr: string }> {
-    return execAsync(command, { encoding: 'utf8' });
+    return execAsync(command, { encoding: 'utf8', timeout: 15000 });
   }
 }
