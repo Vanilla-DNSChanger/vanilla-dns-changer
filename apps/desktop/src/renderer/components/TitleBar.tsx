@@ -1,20 +1,23 @@
 import { Minus, Square, X } from 'lucide-react';
+import { useTranslation } from '../hooks';
+import logoSvg from '../../assets/logo.svg';
 
 export function TitleBar() {
+  const { rtl, t } = useTranslation();
   const handleMinimize = () => window.electron.window.minimize();
   const handleMaximize = () => window.electron.window.maximize();
   const handleClose = () => window.electron.window.close();
 
   return (
-    <div className="h-10 bg-vanilla-dark-100 flex items-center justify-between px-4 drag-region border-b border-vanilla-dark-300">
+    <div className={`h-10 bg-vanilla-dark-100 flex items-center justify-between px-4 drag-region border-b border-vanilla-dark-300 ${rtl ? 'flex-row-reverse' : ''}`}>
       {/* Logo and Title */}
-      <div className="flex items-center gap-3 no-drag">
-        <img src="/logo.svg" alt="Logo" className="w-5 h-5" />
-        <span className="text-sm font-medium text-white">Vanilla DNS Changer</span>
+      <div className={`flex items-center gap-3 no-drag ${rtl ? 'flex-row-reverse' : ''}`}>
+        <img src={logoSvg} alt="Logo" className="w-5 h-5" />
+        <span className="text-sm font-medium text-white">{t.app.name}</span>
       </div>
 
       {/* Window Controls */}
-      <div className="flex items-center no-drag">
+      <div className={`flex items-center no-drag ${rtl ? 'flex-row-reverse' : ''}`}>
         <button
           onClick={handleMinimize}
           className="w-10 h-10 flex items-center justify-center hover:bg-vanilla-dark-200 transition-colors"

@@ -18,6 +18,7 @@ import { useStore } from '../store';
 import { useTranslation } from '../hooks';
 import { URLS, APP_INFO } from '@vanilla-dns/shared';
 import type { AppConfig, NetworkInterface } from '@vanilla-dns/shared';
+import logoSvg from '../../assets/logo.svg';
 
 export function SettingsPage() {
   const { config, setConfig } = useStore();
@@ -267,7 +268,7 @@ export function SettingsPage() {
 
         <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl">
           <div className={`flex items-center gap-4 mb-4 ${rtl ? 'flex-row-reverse' : ''}`}>
-            <img src="/logo.png" alt="Logo" className="w-12 h-12" />
+            <img src={logoSvg} alt="Logo" className="w-12 h-12" />
             <div className={rtl ? 'text-right' : ''}>
               <h3 className="text-xl font-bold text-white">{t.app.name}</h3>
               <p className="text-gray-400">{t.settings.version} {APP_INFO.version}</p>
