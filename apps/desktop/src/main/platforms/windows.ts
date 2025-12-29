@@ -158,8 +158,27 @@ export class WindowsPlatform extends Platform {
       this.selectedInterface = activeInterface.name;
     }
 
+    // Check if connected to a custom DNS (not DHCP/local)
+    // Local DNS usually starts with 127., 192.168., 10., or 172.16-31.
+    // Also exclude APIPA addresses (169.254.x.x) and fec0:
+    const isCustomDns = activeDns.length > 0 && activeDns.some(dns => {
+      // Skip empty or invalid
+      if (!dns || dns === '0.0.0.0') return false;
+      // Skip IPv6 link-local
+      if (dns.startsWith('fec0:') || dns.startsWith('fe80:')) return false;
+      // Skip APIPA
+      if (dns.startsWith('169.254.')) return false;
+      // Skip localhost
+      if (dns.startsWith('127.')) return false;
+      // Skip common private/local DNS (usually routers)
+      if (dns.startsWith('192.168.') && dns.endsWith('.1')) return false;
+      if (dns === '192.168.1.1' || dns === '192.168.0.1') return false;
+      // Consider it custom DNS if it's a known public DNS or Vanilla DNS range
+      return true;
+    });
+
     return {
-      isConnected: activeDns.length > 0 && !activeDns.some(dns => dns === '0.0.0.0' || dns.startsWith('fec0:')),
+      isConnected: isCustomDns,
       activeDns,
       activeInterface,
     };

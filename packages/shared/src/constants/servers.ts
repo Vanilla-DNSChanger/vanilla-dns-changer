@@ -66,14 +66,14 @@ export const DNS_CATEGORIES: DnsCategory[] = [
  * Additional servers can be synced from GitHub
  */
 export const BUILTIN_DNS_SERVERS: DnsServer[] = [
-  // Vanilla DNS - Default and recommended
+  // Vanilla DNS - Default and recommended (in ALL categories)
   {
     key: 'vanilla',
     name: 'Vanilla DNS',
     servers: ['10.139.177.21', '10.139.177.22'],
     rating: 5,
-    tags: ['popular', 'iran', 'fast'],
-    description: 'وانیلا - تحریم‌شکن هوشمند و پرسرعت | Vanilla Bypass DNS',
+    tags: ['popular', 'iran', 'fast', 'security', 'privacy', 'adblock', 'gaming'],
+    description: 'وانیلا - تحریم‌شکن هوشمند و پرسرعت | Vanilla Bypass DNS - Recommended',
     country: 'IR',
     avatar: 'vanilla',
     isDefault: true,

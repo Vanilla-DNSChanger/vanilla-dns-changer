@@ -12,6 +12,11 @@
 /* RTL Support */
 [dir="rtl"] {
   font-family: 'Vazirmatn', sans-serif;
+  text-align: right;
+}
+
+[dir="rtl"] body {
+  direction: rtl;
 }
 
 [dir="rtl"] .text-left {
@@ -20,6 +25,44 @@
 
 [dir="rtl"] .text-right {
   text-align: left;
+}
+
+/* RTL flex direction */
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* RTL margins and paddings */
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+[dir="rtl"] .pl-4 {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+[dir="rtl"] .pr-4 {
+  padding-right: 0;
+  padding-left: 1rem;
 }
 
 /* Custom scrollbar */

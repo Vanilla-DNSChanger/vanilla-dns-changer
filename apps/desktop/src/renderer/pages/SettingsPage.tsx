@@ -15,11 +15,13 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useStore } from '../store';
+import { useTranslation } from '../hooks';
 import { URLS, APP_INFO } from '@vanilla-dns/shared';
 import type { AppConfig, NetworkInterface } from '@vanilla-dns/shared';
 
 export function SettingsPage() {
   const { config, setConfig } = useStore();
+  const { t, rtl } = useTranslation();
   const [interfaces, setInterfaces] = useState<NetworkInterface[]>([]);
   const [selectedInterface, setSelectedInterface] = useState<string>('');
 
@@ -44,9 +46,9 @@ export function SettingsPage() {
     try {
       await window.electron.config.set({ [key]: value });
       setConfig({ [key]: value });
-      toast.success('Settings saved');
+      toast.success(t.common.save);
     } catch (error) {
-      toast.error('Failed to save settings');
+      toast.error(t.errors.unknownError);
     }
   };
 
@@ -65,12 +67,12 @@ export function SettingsPage() {
     description: string;
     children: React.ReactNode;
   }) => (
-    <div className="flex items-center justify-between p-4 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl">
-      <div className="flex items-center gap-4">
+    <div className={`flex items-center justify-between p-4 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl ${rtl ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex items-center gap-4 ${rtl ? 'flex-row-reverse' : ''}`}>
         <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center">
           <Icon className="w-5 h-5 text-vanilla-green-400" />
         </div>
-        <div>
+        <div className={rtl ? 'text-right' : ''}>
           <h3 className="font-medium text-white">{title}</h3>
           <p className="text-sm text-gray-400">{description}</p>
         </div>
@@ -103,9 +105,9 @@ export function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-gray-400 mt-1">Customize your experience</p>
+      <div className={rtl ? 'text-right' : ''}>
+        <h1 className="text-2xl font-bold text-white">{t.settings.title}</h1>
+        <p className="text-gray-400 mt-1">{t.settings.languageDesc}</p>
       </div>
 
       {/* General Settings */}
@@ -114,13 +116,13 @@ export function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">General</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.general}</h2>
 
         {/* Language */}
         <SettingItem
           icon={Globe}
-          title="Language"
-          description="Choose your preferred language"
+          title={t.settings.language}
+          description={t.settings.languageDesc}
         >
           <select
             value={config.language}
@@ -135,17 +137,17 @@ export function SettingsPage() {
         {/* Theme */}
         <SettingItem
           icon={config.theme === 'dark' ? Moon : config.theme === 'light' ? Sun : Monitor}
-          title="Theme"
-          description="Choose your preferred theme"
+          title={t.settings.theme}
+          description={t.settings.themeDesc}
         >
           <select
             value={config.theme}
             onChange={(e) => handleConfigChange('theme', e.target.value)}
             className="px-4 py-2 bg-vanilla-dark-200 border border-vanilla-dark-300 rounded-lg text-white focus:border-vanilla-green-400 transition-colors"
           >
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-            <option value="system">System</option>
+            <option value="dark">{t.settings.dark}</option>
+            <option value="light">{t.settings.light}</option>
+            <option value="system">{t.settings.system}</option>
           </select>
         </SettingItem>
       </motion.div>
@@ -157,13 +159,13 @@ export function SettingsPage() {
         transition={{ delay: 0.1 }}
         className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">Network</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.network}</h2>
 
         {/* Network Interface */}
         <SettingItem
           icon={Wifi}
-          title="Network Interface"
-          description="Select the network interface to configure"
+          title={t.settings.networkInterface}
+          description={t.settings.networkInterfaceDesc}
         >
           <select
             value={selectedInterface}
@@ -175,7 +177,7 @@ export function SettingsPage() {
           >
             {interfaces.map((iface) => (
               <option key={iface.name} value={iface.name}>
-                {iface.displayName} {iface.isActive ? '(Active)' : ''}
+                {iface.displayName} {iface.isActive ? `(${config.language === 'fa' ? 'فعال' : 'Active'})` : ''}
               </option>
             ))}
           </select>
@@ -184,8 +186,8 @@ export function SettingsPage() {
         {/* Auto Sync */}
         <SettingItem
           icon={RefreshCw}
-          title="Auto Sync Servers"
-          description="Automatically sync DNS servers from GitHub"
+          title={t.settings.autoSync}
+          description={t.settings.autoSyncDesc}
         >
           <Toggle
             checked={config.autoSyncServers}
@@ -201,13 +203,13 @@ export function SettingsPage() {
         transition={{ delay: 0.2 }}
         className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">Behavior</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.general}</h2>
 
         {/* Auto Start */}
         <SettingItem
           icon={Play}
-          title="Start on Boot"
-          description="Launch Vanilla DNS when your computer starts"
+          title={t.settings.autoStart}
+          description={t.settings.autoStartDesc}
         >
           <Toggle
             checked={config.autoStart}
@@ -218,8 +220,8 @@ export function SettingsPage() {
         {/* Start Minimized */}
         <SettingItem
           icon={Minimize2}
-          title="Start Minimized"
-          description="Start the app minimized to system tray"
+          title={t.settings.startMinimized}
+          description={t.settings.startMinimizedDesc}
         >
           <Toggle
             checked={config.startMinimized}
@@ -230,8 +232,8 @@ export function SettingsPage() {
         {/* Minimize to Tray */}
         <SettingItem
           icon={Minimize2}
-          title="Minimize to Tray"
-          description="Minimize to system tray instead of closing"
+          title={t.settings.minimizeToTray}
+          description={t.settings.minimizeToTrayDesc}
         >
           <Toggle
             checked={config.minimizeToTray}
@@ -242,8 +244,8 @@ export function SettingsPage() {
         {/* Notifications */}
         <SettingItem
           icon={Bell}
-          title="Notifications"
-          description="Show desktop notifications"
+          title={t.settings.notifications}
+          description={t.settings.notificationsDesc}
         >
           <Toggle
             checked={config.showNotifications}
@@ -259,33 +261,33 @@ export function SettingsPage() {
         transition={{ delay: 0.3 }}
         className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">About</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.about}</h2>
 
         <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl">
-          <div className="flex items-center gap-4 mb-4">
-            <img src="/logo.svg" alt="Logo" className="w-12 h-12" />
-            <div>
-              <h3 className="text-xl font-bold text-white">{APP_INFO.name}</h3>
-              <p className="text-gray-400">Version {APP_INFO.version}</p>
+          <div className={`flex items-center gap-4 mb-4 \${rtl ? 'flex-row-reverse' : ''}`}>
+            <img src="/logo.png" alt="Logo" className="w-12 h-12" />
+            <div className={rtl ? 'text-right' : ''}>
+              <h3 className="text-xl font-bold text-white">{t.app.name}</h3>
+              <p className="text-gray-400">{t.settings.version} {APP_INFO.version}</p>
             </div>
           </div>
 
-          <p className="text-gray-400 mb-4">{APP_INFO.description}</p>
+          <p className={`text-gray-400 mb-4 \${rtl ? 'text-right' : ''}`}>{t.app.tagline}</p>
 
-          <div className="flex gap-3">
+          <div className={`flex gap-3 \${rtl ? 'flex-row-reverse' : ''}`}>
             <button
               onClick={() => openExternal(URLS.GITHUB_REPO)}
-              className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors"
+              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors \${rtl ? 'flex-row-reverse' : ''}`}
             >
               <ExternalLink className="w-4 h-4" />
-              GitHub
+              {t.settings.github}
             </button>
             <button
-              onClick={() => openExternal(URLS.AUTHOR_TWITTER)}
-              className="flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors"
+              onClick={() => openExternal(URLS.WEBSITE)}
+              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors \${rtl ? 'flex-row-reverse' : ''}`}
             >
               <ExternalLink className="w-4 h-4" />
-              @sudolite
+              {t.settings.website}
             </button>
           </div>
         </div>

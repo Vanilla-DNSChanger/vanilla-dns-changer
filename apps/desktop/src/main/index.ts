@@ -22,7 +22,7 @@ function createWindow() {
     frame: false,
     transparent: false,
     backgroundColor: '#0a0a0a',
-    icon: join(__dirname, '../../public/logo.svg'),
+    icon: join(__dirname, '../../public/icon.png'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

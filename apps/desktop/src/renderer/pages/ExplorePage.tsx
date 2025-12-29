@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Star } from 'lucide-react';
 import { useStore } from '../store';
 import { ServerCard } from '../components/ServerCard';
+import { useTranslation } from '../hooks';
 import { DNS_CATEGORIES } from '@vanilla-dns/shared';
 import type { DnsServer } from '@vanilla-dns/shared';
 
@@ -16,12 +17,14 @@ export function ExplorePage() {
     pinServer,
     unpinServer,
     removeCustomServer,
+    config,
   } = useStore();
 
+  const { t, rtl } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Filter servers
+  // Filter servers - put Vanilla DNS first
   const filteredServers = useMemo(() => {
     let result = [...servers, ...customServers];
 
@@ -41,6 +44,13 @@ export function ExplorePage() {
       result = result.filter((server) => server.tags.includes(selectedCategory));
     }
 
+    // Sort: Vanilla DNS first, then by rating
+    result.sort((a, b) => {
+      if (a.key === 'vanilla') return -1;
+      if (b.key === 'vanilla') return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+
     return result;
   }, [servers, customServers, searchQuery, selectedCategory]);
 
@@ -48,13 +58,18 @@ export function ExplorePage() {
     setSelectedServer(server);
   };
 
+  // Get category name based on language
+  const getCategoryName = (category: typeof DNS_CATEGORIES[0]) => {
+    return config.language === 'fa' ? category.nameFA : category.name;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Explore DNS Servers</h1>
+      <div className={rtl ? 'text-right' : ''}>
+        <h1 className="text-2xl font-bold text-white">{t.servers.title}</h1>
         <p className="text-gray-400 mt-1">
-          Browse and discover from {servers.length}+ DNS servers
+          {servers.length}+ {t.servers.all}
         </p>
       </div>
 
@@ -62,19 +77,20 @@ export function ExplorePage() {
       <div className="flex gap-4">
         {/* Search */}
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+          <Search className={`absolute ${rtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500`} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search servers by name, IP, or tag..."
-            className="w-full pl-12 pr-4 py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors"
+            placeholder={t.servers.search}
+            className={`w-full ${rtl ? 'pr-12 pl-4 text-right' : 'pl-12 pr-4'} py-3 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl text-white placeholder-gray-500 focus:border-vanilla-green-400 transition-colors`}
+            dir={rtl ? 'rtl' : 'ltr'}
           />
         </div>
       </div>
 
       {/* Categories */}
-      <div className="flex gap-2 flex-wrap">
+      <div className={`flex gap-2 flex-wrap ${rtl ? 'flex-row-reverse' : ''}`}>
         {DNS_CATEGORIES.map((category) => (
           <button
             key={category.key}
@@ -85,15 +101,15 @@ export function ExplorePage() {
                 : 'bg-vanilla-dark-100 text-gray-400 hover:bg-vanilla-dark-200 hover:text-white'
             }`}
           >
-            {category.icon} {category.name}
+            {category.icon} {getCategoryName(category)}
           </button>
         ))}
       </div>
 
       {/* Results Count */}
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
         <p className="text-sm text-gray-400">
-          Showing {filteredServers.length} servers
+          {filteredServers.length} {t.servers.all}
         </p>
       </div>
 
@@ -109,7 +125,14 @@ export function ExplorePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
+            className="relative"
           >
+            {server.key === 'vanilla' && (
+              <div className={`absolute -top-2 ${rtl ? 'left-2' : 'right-2'} z-10 flex items-center gap-1 px-2 py-0.5 bg-yellow-500 text-black text-xs font-bold rounded-full`}>
+                <Star className="w-3 h-3" />
+                {t.home.recommendedServer}
+              </div>
+            )}
             <ServerCard
               server={server}
               isSelected={selectedServer?.key === server.key}
@@ -127,8 +150,8 @@ export function ExplorePage() {
       {filteredServers.length === 0 && (
         <div className="text-center py-12">
           <Filter className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">No servers found</h3>
-          <p className="text-gray-400">Try adjusting your search or filter</p>
+          <h3 className="text-lg font-medium text-white mb-2">{t.servers.noServers}</h3>
+          <p className="text-gray-400">{t.servers.search}</p>
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { Home, Compass, Settings, Github } from 'lucide-react';
 import { URLS } from '@vanilla-dns/shared';
+import { useTranslation } from '../hooks';
 
 type Page = 'home' | 'explore' | 'settings';
 
@@ -9,10 +10,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
+  const { t } = useTranslation();
+  
   const navItems = [
-    { id: 'home' as const, icon: Home, label: 'Home' },
-    { id: 'explore' as const, icon: Compass, label: 'Explore' },
-    { id: 'settings' as const, icon: Settings, label: 'Settings' },
+    { id: 'home' as const, icon: Home, label: t.nav.home },
+    { id: 'explore' as const, icon: Compass, label: t.nav.servers },
+    { id: 'settings' as const, icon: Settings, label: t.nav.settings },
   ];
 
   const openGitHub = () => {

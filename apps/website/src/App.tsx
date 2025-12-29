@@ -8,10 +8,14 @@ import { Footer } from './components/Footer';
 import { I18nProvider, useI18n } from './i18n';
 
 function AppContent() {
-  const { isRTL } = useI18n();
+  const { isRTL, language } = useI18n();
   
   return (
-    <div className={`min-h-screen bg-vanilla-dark ${isRTL ? 'font-vazir' : ''}`}>
+    <div 
+      className={`min-h-screen bg-vanilla-dark ${isRTL ? 'font-vazir' : 'font-inter'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+      lang={language}
+    >
       <Navbar />
       <main>
         <Hero />
