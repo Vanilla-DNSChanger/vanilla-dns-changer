@@ -30,6 +30,9 @@ export default defineConfig({
         vite: {
           build: {
             outDir: 'dist/preload',
+            rollupOptions: {
+              external: ['electron'],
+            },
           },
         },
       },
@@ -44,9 +47,16 @@ export default defineConfig({
       '@main': resolve(__dirname, './src/main'),
     },
   },
+  optimizeDeps: {
+    include: ['@vanilla-dns/shared'],
+  },
   build: {
     outDir: 'dist/renderer',
     emptyOutDir: true,
+    commonjsOptions: {
+      include: [/node_modules/, /@vanilla-dns\/shared/],
+      transformMixedEsModules: true,
+    },
   },
   server: {
     port: 5173,
