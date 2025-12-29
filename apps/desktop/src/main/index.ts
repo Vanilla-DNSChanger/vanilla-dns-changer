@@ -13,6 +13,13 @@ let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 
 // Create the main window
+function getIconPath(): string {
+  if (process.env.NODE_ENV === 'development' || process.env.VITE_DEV_SERVER_URL) {
+    return join(__dirname, '../../public/icon.png');
+  }
+  return join(__dirname, '../renderer/icon.png');
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -22,7 +29,7 @@ function createWindow() {
     frame: false,
     transparent: false,
     backgroundColor: '#0a0a0a',
-    icon: join(__dirname, '../../public/icon.png'),
+    icon: getIconPath(),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

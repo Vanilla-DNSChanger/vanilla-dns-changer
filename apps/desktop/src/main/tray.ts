@@ -4,9 +4,19 @@ import { AppStore, StoreSchema } from './store';
 
 let isConnected = false;
 
+function getIconPath(): string {
+  // In development, use public folder directly
+  if (process.env.NODE_ENV === 'development' || process.env.VITE_DEV_SERVER_URL) {
+    return join(__dirname, '../../public/icon.png');
+  }
+  // In production, __dirname is dist/main, so go to ../renderer
+  return join(__dirname, '../renderer/icon.png');
+}
+
 export function createTray(mainWindow: BrowserWindow, store: AppStore): Tray {
   // Create tray icon - use PNG instead of SVG for better compatibility
-  const iconPath = join(__dirname, '../../public/icon.png');
+  const iconPath = getIconPath();
+  console.log('Tray icon path:', iconPath);
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   
   const tray = new Tray(icon);

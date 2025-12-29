@@ -2,17 +2,55 @@ name: Publish CLI
 
 on:
   push:
-    tags:
-      - 'cli-v*'
+    branches: [main]
+    paths:
+      - 'apps/cli/**'
+      - 'packages/shared/**'
+      - '.github/workflows/cli.yml'
   workflow_dispatch:
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      cli_changed: ${{ steps.changes.outputs.cli }}
+      shared_changed: ${{ steps.changes.outputs.shared }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for changes
+        id: changes
+        run: |
+          # Get changed files between last 2 commits
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          
+          if echo "$CHANGED" | grep -q "^apps/cli/"; then
+            echo "cli=true" >> $GITHUB_OUTPUT
+            echo "CLI changed"
+          else
+            echo "cli=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if echo "$CHANGED" | grep -q "^packages/shared/"; then
+            echo "shared=true" >> $GITHUB_OUTPUT
+            echo "Shared changed"
+          else
+            echo "shared=false" >> $GITHUB_OUTPUT
+          fi
+
   publish:
+    needs: check-changes
+    if: needs.check-changes.outputs.cli_changed == 'true' || needs.check-changes.outputs.shared_changed == 'true'
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,18 +85,54 @@ jobs:
       - name: Build CLI
         run: pnpm --filter @vanilla-dns/cli build
 
-      - name: Publish shared to npm
+      - name: Bump shared version and publish
+        if: needs.check-changes.outputs.shared_changed == 'true'
         run: |
           cd packages/shared
-          npm publish --access public || echo "shared already published or error"
+          # Get current version from npm
+          CURRENT=$(npm view @vanilla-dns/shared version 2>/dev/null || echo "0.0.0")
+          echo "Current npm version: $CURRENT"
+          
+          # Increment patch version
+          NEW_VERSION=$(echo $CURRENT | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New version: $NEW_VERSION"
+          
+          # Update package.json
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          # Publish
+          npm publish --access public
+          
+          # Export for CLI
+          echo "SHARED_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Update CLI dependency and publish
+      - name: Get shared version
+        if: needs.check-changes.outputs.shared_changed != 'true'
+        run: |
+          SHARED_VERSION=$(npm view @vanilla-dns/shared version 2>/dev/null || echo "1.0.1")
+          echo "SHARED_VERSION=$SHARED_VERSION" >> $GITHUB_ENV
+
+      - name: Bump CLI version and publish
+        if: needs.check-changes.outputs.cli_changed == 'true'
         run: |
           cd apps/cli
-          # Replace workspace:* with actual version
-          sed -i 's/"@vanilla-dns\/shared": "workspace:\*"/"@vanilla-dns\/shared": "^1.0.1"/' package.json
+          # Get current version from npm
+          CURRENT=$(npm view @vanilla-dns/cli version 2>/dev/null || echo "0.0.0")
+          echo "Current npm version: $CURRENT"
+          
+          # Increment patch version
+          NEW_VERSION=$(echo $CURRENT | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New version: $NEW_VERSION"
+          
+          # Update package.json
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          # Replace workspace:* with actual shared version
+          sed -i 's/"@vanilla-dns\/shared": "workspace:\*"/"@vanilla-dns\/shared": "^'$SHARED_VERSION'"/' package.json
+          
+          # Publish
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
