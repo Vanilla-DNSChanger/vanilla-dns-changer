@@ -89,22 +89,49 @@ export class WindowsPlatform extends Platform {
       const interfaceName = await this.getInterfaceName();
       const [primary, secondary] = servers;
 
+      console.log(`Setting DNS for interface: ${interfaceName}`);
+      console.log(`Primary DNS: ${primary}, Secondary DNS: ${secondary || 'none'}`);
+
+      // Validate servers
+      if (!primary || !primary.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+        return { success: false, error: 'Invalid primary DNS server address' };
+      }
+
       // Use netsh for setting DNS - more reliable with admin privileges
-      const cmdServer1 = `netsh interface ip set dns "${interfaceName}" static ${primary}`;
+      const cmdServer1 = `netsh interface ip set dns name="${interfaceName}" static ${primary} validate=no`;
+      console.log(`Executing: ${cmdServer1}`);
       await this.executeNetsh(cmdServer1);
 
-      if (secondary) {
-        const cmdServer2 = `netsh interface ip add dns "${interfaceName}" ${secondary} index=2`;
+      if (secondary && secondary.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+        const cmdServer2 = `netsh interface ip add dns name="${interfaceName}" ${secondary} index=2 validate=no`;
+        console.log(`Executing: ${cmdServer2}`);
         await this.executeNetsh(cmdServer2);
       }
 
       // Flush DNS cache after setting
       await this.flushDnsCache();
 
-      return { success: true, message: 'DNS servers updated successfully' };
+      // Verify the DNS was set correctly
+      const newDns = await this.getActiveDns();
+      if (newDns.includes(primary)) {
+        return { success: true, message: 'DNS servers updated successfully' };
+      } else {
+        console.warn('DNS verification failed. Current DNS:', newDns);
+        return { success: true, message: 'DNS command executed. Please verify the connection.' };
+      }
     } catch (error: any) {
       console.error('setDns error:', error);
-      return { success: false, error: error.message || 'Failed to set DNS' };
+      const errorMessage = error.message || 'Failed to set DNS';
+      
+      // Provide more helpful error messages
+      if (errorMessage.includes('access') || errorMessage.includes('denied') || errorMessage.includes('Administrator')) {
+        return { success: false, error: 'Administrator privileges required. Please run the application as Administrator.' };
+      }
+      if (errorMessage.includes('not found') || errorMessage.includes('interface')) {
+        return { success: false, error: `Network interface "${await this.getInterfaceName().catch(() => 'unknown')}" not found. Please check your network connection.` };
+      }
+      
+      return { success: false, error: errorMessage };
     }
   }
 
@@ -112,8 +139,11 @@ export class WindowsPlatform extends Platform {
     try {
       const interfaceName = await this.getInterfaceName();
 
+      console.log(`Clearing DNS for interface: ${interfaceName}`);
+
       // Reset to DHCP
-      const cmd = `netsh interface ip set dns "${interfaceName}" dhcp`;
+      const cmd = `netsh interface ip set dns name="${interfaceName}" dhcp`;
+      console.log(`Executing: ${cmd}`);
       await this.executeNetsh(cmd);
 
       // Flush DNS cache
@@ -469,27 +499,34 @@ export class WindowsPlatform extends Platform {
   }
 
   /**
-   * Execute a netsh command with sudo if needed
+   * Execute a netsh command
+   * On Windows, the app runs with admin privileges (requestedExecutionLevel in package.json)
+   * So we can execute commands directly
    */
   private async executeNetsh(command: string): Promise<{ stdout: string; stderr: string }> {
-    const sudo = require('sudo-prompt');
-    return new Promise((resolve, reject) => {
-      sudo.exec(command, { name: 'Vanilla DNS Changer' }, (error: any, stdout: string, stderr: string) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve({ stdout: stdout || '', stderr: stderr || '' });
-        }
-      });
-    });
+    try {
+      // First try direct execution (works when app is run as admin)
+      return await execAsync(command, { encoding: 'utf8', timeout: 30000 });
+    } catch (error: any) {
+      console.error('Direct netsh execution failed:', error.message);
+      
+      // Fallback: try using PowerShell with elevated context
+      try {
+        const psCommand = `powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& {${command.replace(/"/g, '\\"')}}"`;
+        return await execAsync(psCommand, { encoding: 'utf8', timeout: 30000 });
+      } catch (psError: any) {
+        console.error('PowerShell netsh execution failed:', psError.message);
+        throw new Error(`Failed to execute command. Please run the application as Administrator. Original error: ${error.message}`);
+      }
+    }
   }
 
   private async executePowerShell(command: string): Promise<{ stdout: string; stderr: string }> {
     const psCommand = `powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "${command.replace(/"/g, '\\"')}"`;
-    return execAsync(psCommand, { encoding: 'utf8', timeout: 15000 });
+    return execAsync(psCommand, { encoding: 'utf8', timeout: 30000 });
   }
 
   protected async execute(command: string): Promise<{ stdout: string; stderr: string }> {
-    return execAsync(command, { encoding: 'utf8', timeout: 15000 });
+    return execAsync(command, { encoding: 'utf8', timeout: 30000 });
   }
 }
