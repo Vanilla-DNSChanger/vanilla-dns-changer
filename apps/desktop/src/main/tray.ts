@@ -5,8 +5,8 @@ import { AppStore, StoreSchema } from './store';
 let isConnected = false;
 
 export function createTray(mainWindow: BrowserWindow, store: AppStore): Tray {
-  // Create tray icon
-  const iconPath = join(__dirname, '../../public/logo.svg');
+  // Create tray icon - use PNG instead of SVG for better compatibility
+  const iconPath = join(__dirname, '../../public/icon.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   
   const tray = new Tray(icon);
@@ -44,6 +44,12 @@ export function updateTrayMenu(tray: Tray, mainWindow: BrowserWindow) {
       label: 'Quick Connect',
       submenu: [
         {
+          label: 'Vanilla DNS',
+          click: () => {
+            mainWindow.webContents.send('tray:quick-connect', 'vanilla');
+          },
+        },
+        {
           label: 'Google DNS',
           click: () => {
             mainWindow.webContents.send('tray:quick-connect', 'google');
@@ -53,12 +59,6 @@ export function updateTrayMenu(tray: Tray, mainWindow: BrowserWindow) {
           label: 'Cloudflare',
           click: () => {
             mainWindow.webContents.send('tray:quick-connect', 'cloudflare');
-          },
-        },
-        {
-          label: 'Shecan',
-          click: () => {
-            mainWindow.webContents.send('tray:quick-connect', 'shecan');
           },
         },
       ],

@@ -1,6 +1,6 @@
 {
   "name": "@vanilla-dns/shared",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared utilities, types, and constants for Vanilla DNS Changer",
   "author": {
     "name": "SudoLite",

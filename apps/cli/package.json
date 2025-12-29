@@ -1,6 +1,6 @@
 {
   "name": "@vanilla-dns/cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Vanilla DNS Changer - Command Line Interface",
   "author": {
     "name": "SudoLite",

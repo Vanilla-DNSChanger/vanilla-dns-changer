@@ -58,7 +58,7 @@ jobs:
         run: |
           cd apps/cli
           # Replace workspace:* with actual version
-          sed -i 's/"@vanilla-dns\/shared": "workspace:\*"/"@vanilla-dns\/shared": "^1.0.0"/' package.json
+          sed -i 's/"@vanilla-dns\/shared": "workspace:\*"/"@vanilla-dns\/shared": "^1.0.1"/' package.json
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
