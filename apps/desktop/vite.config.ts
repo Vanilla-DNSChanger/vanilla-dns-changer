@@ -44,9 +44,16 @@ export default defineConfig({
       '@main': resolve(__dirname, './src/main'),
     },
   },
+  optimizeDeps: {
+    include: ['@emotion/is-prop-valid', 'framer-motion'],
+  },
   build: {
     outDir: 'dist/renderer',
     emptyOutDir: true,
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
   },
   server: {
     port: 5173,
