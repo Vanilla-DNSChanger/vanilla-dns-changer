@@ -13,6 +13,7 @@ interface AppState {
   status: DnsStatus;
   isConnecting: boolean;
   selectedServer: DnsServer | null;
+  justConnected: boolean; // Flag to prevent loadStatus override
 
   // Servers
   servers: DnsServer[];
@@ -53,6 +54,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
   isConnecting: false,
   selectedServer: null,
+  justConnected: false,
   servers: BUILTIN_DNS_SERVERS,
   customServers: [],
   pinnedServerKeys: [],
@@ -93,6 +95,10 @@ export const useStore = create<AppState>((set, get) => ({
 
   loadStatus: async () => {
     try {
+      // Skip if we just connected - wait for DNS to propagate
+      if (get().justConnected) {
+        return;
+      }
       const status = await window.electron.dns.getStatus();
       set({ status });
 
@@ -126,7 +132,12 @@ export const useStore = create<AppState>((set, get) => ({
             serverKey: server.key,
           },
           selectedServer: server,
+          justConnected: true,
         });
+        // Clear justConnected flag after 10 seconds to allow status updates
+        setTimeout(() => {
+          set({ justConnected: false });
+        }, 10000);
         return true;
       }
       return false;

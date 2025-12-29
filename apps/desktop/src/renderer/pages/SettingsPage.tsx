@@ -110,9 +110,9 @@ export function SettingsPage() {
   );
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl" dir={rtl ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className={rtl ? 'text-right' : ''}>
+      <div>
         <h1 className="text-2xl font-bold text-white">{t.settings.title}</h1>
         <p className="text-gray-400 mt-1">{t.settings.languageDesc}</p>
       </div>
@@ -123,7 +123,7 @@ export function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
-        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.general}</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">{t.settings.general}</h2>
 
         {/* Language */}
         <SettingItem
@@ -166,7 +166,7 @@ export function SettingsPage() {
         transition={{ delay: 0.1 }}
         className="space-y-3"
       >
-        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.network}</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 `}>{t.settings.network}</h2>
 
         {/* Network Interface */}
         <SettingItem
@@ -210,7 +210,7 @@ export function SettingsPage() {
         transition={{ delay: 0.2 }}
         className="space-y-3"
       >
-        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.general}</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 `}>{t.settings.general}</h2>
 
         {/* Auto Start */}
         <SettingItem
@@ -268,7 +268,7 @@ export function SettingsPage() {
         transition={{ delay: 0.3 }}
         className="space-y-3"
       >
-        <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.about}</h2>
+        <h2 className={`text-lg font-semibold text-white mb-4 `}>{t.settings.about}</h2>
 
         <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl" dir={rtl ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-4 mb-4">

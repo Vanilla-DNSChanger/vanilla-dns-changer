@@ -10,13 +10,13 @@ export function TitleBar() {
 
   return (
     <div className="h-10 bg-vanilla-dark-100 flex items-center justify-between px-4 drag-region border-b border-vanilla-dark-300">
-      {/* Logo and Title */}
-      <div className={`flex items-center gap-3 no-drag ${rtl ? 'order-last' : 'order-first'}`}>
+      {/* Logo and Title - RTL: on right side */}
+      <div className={`flex items-center gap-3 no-drag ${rtl ? 'flex-row-reverse' : ''}`} dir={rtl ? 'rtl' : 'ltr'}>
         <img src={logoSvg} alt="Logo" className="w-5 h-5" />
         <span className="text-sm font-medium text-white">{t.app.name}</span>
       </div>
 
-      {/* Window Controls - Always on right for Windows */}
+      {/* Window Controls - Always on right side of window */}
       <div className="flex items-center no-drag">
         <button
           onClick={handleMinimize}

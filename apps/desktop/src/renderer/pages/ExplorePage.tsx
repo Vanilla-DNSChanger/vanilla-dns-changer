@@ -94,13 +94,14 @@ export function ExplorePage() {
           <button
             key={category.key}
             onClick={() => setSelectedCategory(category.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               selectedCategory === category.key
                 ? 'bg-vanilla-green-400 text-black'
                 : 'bg-vanilla-dark-100 text-gray-400 hover:bg-vanilla-dark-200 hover:text-white'
             }`}
           >
-            {category.icon} {getCategoryName(category)}
+            <span>{category.icon}</span>
+            <span>{getCategoryName(category)}</span>
           </button>
         ))}
       </div>
