@@ -121,6 +121,15 @@ export interface Translations {
     copy: string;
     copied: string;
   };
+  update: {
+    newVersion: string;
+    changelog: string;
+    download: string;
+    warning: string;
+    checking: string;
+    upToDate: string;
+    available: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -245,6 +254,15 @@ export const translations: Record<Language, Translations> = {
       copy: 'Copy',
       copied: 'Copied!',
     },
+    update: {
+      newVersion: 'New Version Available!',
+      changelog: 'What\'s New',
+      download: 'Download Update',
+      warning: 'Please download and install the new version for the best experience and security.',
+      checking: 'Checking for updates...',
+      upToDate: 'You are using the latest version',
+      available: 'Version {version} is available',
+    },
   },
   fa: {
     app: {
@@ -366,6 +384,15 @@ export const translations: Record<Language, Translations> = {
       refresh: 'بازنشانی',
       copy: 'کپی',
       copied: 'کپی شد!',
+    },
+    update: {
+      newVersion: 'نسخه جدید موجود است!',
+      changelog: 'تغییرات',
+      download: 'دانلود به‌روزرسانی',
+      warning: 'لطفاً نسخه جدید را برای تجربه و امنیت بهتر دانلود و نصب کنید.',
+      checking: 'در حال بررسی به‌روزرسانی...',
+      upToDate: 'شما از آخرین نسخه استفاده می‌کنید',
+      available: 'نسخه {version} موجود است',
     },
   },
 };

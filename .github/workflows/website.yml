@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/website/**'
       - 'packages/shared/**'
+      - '.github/workflows/website.yml'
   workflow_dispatch:
 
 permissions:
@@ -51,22 +52,19 @@ jobs:
       - name: Build website
         run: pnpm --filter @vanilla-dns/website build
 
+      - name: Add CNAME and nojekyll
+        run: |
+          echo "vanilla-dnschanger.github.io" > apps/website/dist/CNAME
+          touch apps/website/dist/.nojekyll
+
       - name: Deploy to vanilla-dnschanger.github.io
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.PAGES_TOKEN }}
           external_repository: Vanilla-DNSChanger/vanilla-dnschanger.github.io
           publish_branch: main
           publish_dir: apps/website/dist
-          cname: vanilla-dnschanger.github.io
-        env:
-          PERSONAL_TOKEN: ${{ secrets.PAGES_TOKEN }}
-        if: ${{ env.PERSONAL_TOKEN != '' }}
-
-      - name: Deploy to vanilla-dnschanger.github.io (manual)
-        if: ${{ env.PERSONAL_TOKEN == '' }}
-        run: |
-          echo "⚠️ PAGES_TOKEN secret not set. Website was built but not deployed."
-          echo "To enable automatic deployment, create a Personal Access Token and add it as PAGES_TOKEN secret."
-          echo "Built files are in apps/website/dist/"
-          ls -la apps/website/dist/
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy website from vanilla-dns-changer@${{ github.sha }}'

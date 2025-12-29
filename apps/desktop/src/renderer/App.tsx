@@ -5,13 +5,24 @@ import { Sidebar } from './components/Sidebar';
 import { HomePage } from './pages/HomePage';
 import { ExplorePage } from './pages/ExplorePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { UpdateModal } from './components/UpdateModal';
 import { useStore } from './store';
 import { useTranslation, useTheme } from './hooks';
 
 type Page = 'home' | 'explore' | 'settings';
 
+interface UpdateInfo {
+  version: string;
+  changelog: string;
+  downloadUrl: string;
+}
+
+const CURRENT_VERSION = '1.0.0';
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const { loadConfig, loadServers, config } = useStore();
   const { rtl, dir } = useTranslation();
   const { isDark } = useTheme();
@@ -20,7 +31,67 @@ function App() {
     // Load config and servers on mount
     loadConfig();
     loadServers();
+    
+    // Check for updates
+    checkForUpdates();
   }, []);
+
+  const checkForUpdates = async () => {
+    try {
+      const response = await fetch('https://api.github.com/repos/Vanilla-DNSChanger/vanilla-dns-changer/releases/latest', {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+      
+      if (!response.ok) return;
+      
+      const release = await response.json();
+      const latestVersion = release.tag_name.replace(/^v/, '');
+      
+      // Compare versions
+      if (compareVersions(latestVersion, CURRENT_VERSION) > 0) {
+        const platform = navigator.platform.toLowerCase();
+        let downloadUrl = release.html_url;
+        
+        // Find appropriate asset for current platform
+        for (const asset of release.assets) {
+          if (platform.includes('win') && asset.name.includes('Setup') && asset.name.endsWith('.exe')) {
+            downloadUrl = asset.browser_download_url;
+            break;
+          } else if (platform.includes('mac') && asset.name.endsWith('.dmg')) {
+            downloadUrl = asset.browser_download_url;
+            break;
+          } else if (platform.includes('linux') && asset.name.endsWith('.AppImage')) {
+            downloadUrl = asset.browser_download_url;
+            break;
+          }
+        }
+        
+        setUpdateInfo({
+          version: latestVersion,
+          changelog: release.body || 'No changelog available',
+          downloadUrl,
+        });
+        setShowUpdateModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to check for updates:', error);
+    }
+  };
+
+  const compareVersions = (v1: string, v2: string): number => {
+    const parts1 = v1.split('.').map(Number);
+    const parts2 = v2.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+      const p1 = parts1[i] || 0;
+      const p2 = parts2[i] || 0;
+      if (p1 > p2) return 1;
+      if (p1 < p2) return -1;
+    }
+    return 0;
+  };
 
   // Apply theme and direction to document
   useEffect(() => {
@@ -88,6 +159,18 @@ function App() {
           },
         }}
       />
+
+      {/* Update Modal */}
+      {updateInfo && (
+        <UpdateModal
+          isOpen={showUpdateModal}
+          onClose={() => setShowUpdateModal(false)}
+          version={updateInfo.version}
+          changelog={updateInfo.changelog}
+          downloadUrl={updateInfo.downloadUrl}
+          currentVersion={CURRENT_VERSION}
+        />
+      )}
     </div>
   );
 }

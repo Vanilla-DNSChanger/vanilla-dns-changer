@@ -9,3 +9,6 @@ export * from './constants';
 
 // Platforms
 export * from './platforms';
+
+// Utils
+export * from './utils/updater';

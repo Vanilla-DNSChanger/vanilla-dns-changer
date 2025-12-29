@@ -64,10 +64,10 @@ export function Navbar() {
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-2 px-3 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg transition-colors"
-              title={language === 'en' ? 'فارسی' : 'English'}
+              title={language === 'en' ? 'Switch to Persian' : 'تغییر به انگلیسی'}
             >
               <Globe className="w-4 h-4" />
-              <span className="text-sm">{language === 'en' ? 'FA' : 'EN'}</span>
+              <span className="text-sm font-medium">{language === 'en' ? 'EN' : 'FA'}</span>
             </button>
             
             {/* GitHub Button */}
