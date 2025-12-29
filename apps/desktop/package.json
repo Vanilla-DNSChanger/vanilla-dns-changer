@@ -31,6 +31,7 @@
     "dist:linux": "electron-builder --linux"
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
     "@vanilla-dns/shared": "workspace:*",
     "electron-updater": "^6.1.7",
     "sudo-prompt": "^9.2.1",

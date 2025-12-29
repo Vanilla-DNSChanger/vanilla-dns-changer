@@ -30,11 +30,21 @@ export default defineConfig({
         vite: {
           build: {
             outDir: 'dist/preload',
+            rollupOptions: {
+              external: ['electron'],
+            },
           },
         },
       },
     ]),
-    renderer(),
+    renderer({
+      resolve: {
+        // Don't use Node.js modules in renderer
+        'electron-store': { type: 'cjs' },
+        'electron-updater': { type: 'cjs' },
+        'sudo-prompt': { type: 'cjs' },
+      },
+    }),
   ],
   resolve: {
     alias: {
@@ -46,6 +56,12 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@emotion/is-prop-valid', 'framer-motion'],
+    esbuildOptions: {
+      // Ensure proper handling of commonjs modules
+      define: {
+        global: 'globalThis',
+      },
+    },
   },
   build: {
     outDir: 'dist/renderer',
@@ -53,6 +69,14 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      output: {
+        // Ensure framer-motion's dynamic require is handled
+        manualChunks: {
+          'framer-motion': ['framer-motion'],
+        },
+      },
     },
   },
   server: {
