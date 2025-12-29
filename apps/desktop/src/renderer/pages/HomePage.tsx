@@ -203,14 +203,16 @@ export function HomePage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-400">{vanillaServer.description}</p>
-                  <p className="text-xs text-gray-500 font-mono mt-1" dir="ltr">
-                    {vanillaServer.servers.join(' / ')}
-                  </p>
                 </div>
               </div>
-              {selectedServer?.key === vanillaServer.key && (
-                <div className="w-3 h-3 bg-vanilla-green-400 rounded-full flex-shrink-0" />
-              )}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <p className="text-xs text-gray-500 font-mono" dir="ltr">
+                  {vanillaServer.servers.join(' / ')}
+                </p>
+                {selectedServer?.key === vanillaServer.key && (
+                  <div className="w-3 h-3 bg-vanilla-green-400 rounded-full" />
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
