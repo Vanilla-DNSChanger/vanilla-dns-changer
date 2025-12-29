@@ -32,8 +32,12 @@ function App() {
     loadConfig();
     loadServers();
     
-    // Check for updates
-    checkForUpdates();
+    // Check for updates after a short delay
+    const timer = setTimeout(() => {
+      checkForUpdates();
+    }, 2000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const checkForUpdates = async () => {
