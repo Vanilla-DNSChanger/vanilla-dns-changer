@@ -1,6 +1,5 @@
-import { exec, execSync } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
-import network from 'network';
 import {
   Platform,
   DnsStatus,
@@ -12,64 +11,90 @@ import {
 const execAsync = promisify(exec);
 
 /**
- * Network interface from the 'network' package
- */
-interface NetworkPackageInterface {
-  name: string;
-  mac_address: string | undefined;
-  ip_address: string | undefined;
-  vendor: string;
-  model: string;
-  type: string;
-  netmask: string | null;
-  gateway_ip: string | null;
-}
-
-/**
  * Windows Platform implementation
- * Uses the 'network' package for reliable adapter detection
- * and netsh/PowerShell for DNS operations
+ * Uses PowerShell and netsh for DNS operations
+ * No external dependencies - pure Windows commands
  */
 export class WindowsPlatform extends Platform {
   readonly type = 'windows' as const;
   private selectedInterface: string | null = null;
-  private cachedActiveInterface: NetworkPackageInterface | null = null;
-  private lastInterfaceCheck: number = 0;
-  private static INTERFACE_CACHE_TTL = 10000; // 10 seconds
+  private cachedInterfaceName: string | null = null;
 
   /**
-   * Get the active network interface with gateway
-   * This is the most reliable way to detect the primary network adapter
+   * Get the active network interface name using PowerShell
+   * This is the most reliable method for Windows
    */
-  private async getValidateInterface(): Promise<NetworkPackageInterface> {
-    // Use cached value if still valid
-    const now = Date.now();
-    if (this.cachedActiveInterface && (now - this.lastInterfaceCheck) < WindowsPlatform.INTERFACE_CACHE_TTL) {
-      return this.cachedActiveInterface;
+  private async detectActiveInterface(): Promise<string> {
+    // Return cached value if available
+    if (this.cachedInterfaceName) {
+      return this.cachedInterfaceName;
     }
 
-    return new Promise((resolve, reject) => {
-      network.get_interfaces_list((err: Error | null, interfaces: NetworkPackageInterface[]) => {
-        if (err) {
-          reject(new Error('Failed to get network interfaces: ' + err.message));
-          return;
+    // Method 1: Use Get-NetRoute to find the interface with default route
+    try {
+      const { stdout } = await this.executePowerShell(
+        `(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object -Property RouteMetric | Select-Object -First 1).InterfaceAlias`
+      );
+      const interfaceName = stdout.trim();
+      if (interfaceName && !interfaceName.includes('error') && interfaceName.length > 0) {
+        console.log('Detected interface via Get-NetRoute:', interfaceName);
+        this.cachedInterfaceName = interfaceName;
+        return interfaceName;
+      }
+    } catch (e) {
+      console.log('Get-NetRoute method failed:', e);
+    }
+
+    // Method 2: Use Get-NetAdapter to find connected adapter
+    try {
+      const { stdout } = await this.executePowerShell(
+        `(Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -First 1).Name`
+      );
+      const interfaceName = stdout.trim();
+      if (interfaceName && !interfaceName.includes('error') && interfaceName.length > 0) {
+        console.log('Detected interface via Get-NetAdapter:', interfaceName);
+        this.cachedInterfaceName = interfaceName;
+        return interfaceName;
+      }
+    } catch (e) {
+      console.log('Get-NetAdapter method failed:', e);
+    }
+
+    // Method 3: Use netsh to find connected interface
+    try {
+      const { stdout } = await this.execute('netsh interface show interface');
+      const lines = stdout.split('\n');
+      for (const line of lines) {
+        if (line.includes('Connected') && line.includes('Enabled')) {
+          const parts = line.trim().split(/\s{2,}/);
+          if (parts.length >= 4) {
+            const interfaceName = parts[3];
+            console.log('Detected interface via netsh:', interfaceName);
+            this.cachedInterfaceName = interfaceName;
+            return interfaceName;
+          }
         }
+      }
+    } catch (e) {
+      console.log('netsh method failed:', e);
+    }
 
-        // Find the interface with an active gateway (this is the primary internet connection)
-        const activeInterface = interfaces.find(
-          (iface: NetworkPackageInterface) => iface.gateway_ip != null && iface.gateway_ip !== ''
-        );
-
-        if (!activeInterface) {
-          reject(new Error('No active network connection found. Please check your internet connection.'));
-          return;
+    // Method 4: Common interface names fallback
+    const commonNames = ['Wi-Fi', 'Ethernet', 'Ethernet 2', 'Local Area Connection'];
+    for (const name of commonNames) {
+      try {
+        const { stdout } = await this.execute(`netsh interface show interface name="${name}"`);
+        if (stdout.toLowerCase().includes('connected')) {
+          console.log('Detected interface via common names:', name);
+          this.cachedInterfaceName = name;
+          return name;
         }
+      } catch {
+        continue;
+      }
+    }
 
-        this.cachedActiveInterface = activeInterface;
-        this.lastInterfaceCheck = now;
-        resolve(activeInterface);
-      });
-    });
+    throw new Error('No active network interface found. Please check your internet connection.');
   }
 
   /**
@@ -79,80 +104,146 @@ export class WindowsPlatform extends Platform {
     if (this.selectedInterface && this.selectedInterface !== 'Auto') {
       return this.selectedInterface;
     }
-
-    const activeInterface = await this.getValidateInterface();
-    return activeInterface.name;
+    return await this.detectActiveInterface();
   }
 
   async setDns(servers: string[]): Promise<DnsOperationResult> {
     try {
-      const interfaceName = await this.getInterfaceName();
       const [primary, secondary] = servers;
 
-      console.log(`Setting DNS for interface: ${interfaceName}`);
-      console.log(`Primary DNS: ${primary}, Secondary DNS: ${secondary || 'none'}`);
-
-      // Validate servers
-      if (!primary || !primary.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+      // Validate primary server
+      if (!primary || !this.isValidIp(primary)) {
         return { success: false, error: 'Invalid primary DNS server address' };
       }
 
-      // Use netsh for setting DNS - more reliable with admin privileges
-      const cmdServer1 = `netsh interface ip set dns name="${interfaceName}" static ${primary} validate=no`;
-      console.log(`Executing: ${cmdServer1}`);
-      await this.executeNetsh(cmdServer1);
-
-      if (secondary && secondary.match(/^\d+\.\d+\.\d+\.\d+$/)) {
-        const cmdServer2 = `netsh interface ip add dns name="${interfaceName}" ${secondary} index=2 validate=no`;
-        console.log(`Executing: ${cmdServer2}`);
-        await this.executeNetsh(cmdServer2);
+      // Get interface name
+      let interfaceName: string;
+      try {
+        interfaceName = await this.getInterfaceName();
+      } catch (e: any) {
+        return { success: false, error: e.message };
       }
 
-      // Flush DNS cache after setting
-      await this.flushDnsCache();
+      console.log(`Setting DNS for interface: "${interfaceName}"`);
+      console.log(`Primary DNS: ${primary}, Secondary DNS: ${secondary || 'none'}`);
 
-      // Verify the DNS was set correctly
-      const newDns = await this.getActiveDns();
-      if (newDns.includes(primary)) {
+      // Try PowerShell method first (more reliable on modern Windows)
+      try {
+        const dnsServers = secondary && this.isValidIp(secondary) 
+          ? `@("${primary}","${secondary}")`
+          : `@("${primary}")`;
+        
+        const psCommand = `Set-DnsClientServerAddress -InterfaceAlias "${interfaceName}" -ServerAddresses ${dnsServers}`;
+        console.log('Executing PowerShell:', psCommand);
+        await this.executePowerShell(psCommand);
+        
+        // Flush DNS cache
+        await this.flushDnsCache();
+
+        // Verify
+        const newDns = await this.getActiveDns();
+        console.log('DNS after setting:', newDns);
+        
+        if (newDns.includes(primary)) {
+          return { success: true, message: 'DNS servers updated successfully' };
+        }
+        
+        // Even if verification fails, the command might have succeeded
+        return { success: true, message: 'DNS command executed successfully' };
+      } catch (psError: any) {
+        console.error('PowerShell Set-DnsClientServerAddress failed:', psError.message);
+        
+        // Check if it's a permission issue
+        if (psError.message.includes('denied') || 
+            psError.message.includes('administrator') ||
+            psError.message.includes('elevation')) {
+          return { 
+            success: false, 
+            error: 'Administrator privileges required. Please run the application as Administrator.' 
+          };
+        }
+      }
+
+      // Fallback to netsh
+      try {
+        console.log('Trying netsh fallback...');
+        
+        // Set primary DNS
+        const cmd1 = `netsh interface ipv4 set dnsservers name="${interfaceName}" static ${primary} primary`;
+        console.log('Executing:', cmd1);
+        await this.execute(cmd1);
+
+        // Set secondary DNS if provided
+        if (secondary && this.isValidIp(secondary)) {
+          const cmd2 = `netsh interface ipv4 add dnsservers name="${interfaceName}" ${secondary} index=2`;
+          console.log('Executing:', cmd2);
+          await this.execute(cmd2);
+        }
+
+        // Flush DNS cache
+        await this.flushDnsCache();
+
         return { success: true, message: 'DNS servers updated successfully' };
-      } else {
-        console.warn('DNS verification failed. Current DNS:', newDns);
-        return { success: true, message: 'DNS command executed. Please verify the connection.' };
+      } catch (netshError: any) {
+        console.error('netsh fallback failed:', netshError.message);
+        
+        // Check if it's a permission issue
+        if (netshError.message.includes('requires elevation') || 
+            netshError.message.includes('Access is denied') ||
+            netshError.message.includes('administrator')) {
+          return { 
+            success: false, 
+            error: 'Administrator privileges required. Please run the application as Administrator.' 
+          };
+        }
+        
+        return { success: false, error: netshError.message };
       }
     } catch (error: any) {
       console.error('setDns error:', error);
-      const errorMessage = error.message || 'Failed to set DNS';
-      
-      // Provide more helpful error messages
-      if (errorMessage.includes('access') || errorMessage.includes('denied') || errorMessage.includes('Administrator')) {
-        return { success: false, error: 'Administrator privileges required. Please run the application as Administrator.' };
-      }
-      if (errorMessage.includes('not found') || errorMessage.includes('interface')) {
-        return { success: false, error: `Network interface "${await this.getInterfaceName().catch(() => 'unknown')}" not found. Please check your network connection.` };
-      }
-      
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message || 'Failed to set DNS' };
     }
   }
 
   async clearDns(): Promise<DnsOperationResult> {
     try {
-      const interfaceName = await this.getInterfaceName();
+      let interfaceName: string;
+      try {
+        interfaceName = await this.getInterfaceName();
+      } catch (e: any) {
+        return { success: false, error: e.message };
+      }
 
-      console.log(`Clearing DNS for interface: ${interfaceName}`);
+      console.log(`Clearing DNS for interface: "${interfaceName}"`);
 
-      // Reset to DHCP
-      const cmd = `netsh interface ip set dns name="${interfaceName}" dhcp`;
-      console.log(`Executing: ${cmd}`);
-      await this.executeNetsh(cmd);
+      // Try PowerShell method first
+      try {
+        const psCommand = `Set-DnsClientServerAddress -InterfaceAlias "${interfaceName}" -ResetServerAddresses`;
+        console.log('Executing PowerShell:', psCommand);
+        await this.executePowerShell(psCommand);
+        
+        await this.flushDnsCache();
+        this.cachedInterfaceName = null;
+        
+        return { success: true, message: 'DNS reset to DHCP' };
+      } catch (psError: any) {
+        console.error('PowerShell reset failed:', psError.message);
+      }
 
-      // Flush DNS cache
-      await this.flushDnsCache();
-
-      // Clear the cached interface since network state might change
-      this.cachedActiveInterface = null;
-
-      return { success: true, message: 'DNS reset to DHCP' };
+      // Fallback to netsh
+      try {
+        const cmd = `netsh interface ipv4 set dnsservers name="${interfaceName}" dhcp`;
+        console.log('Executing:', cmd);
+        await this.execute(cmd);
+        
+        await this.flushDnsCache();
+        this.cachedInterfaceName = null;
+        
+        return { success: true, message: 'DNS reset to DHCP' };
+      } catch (netshError: any) {
+        console.error('netsh reset failed:', netshError.message);
+        return { success: false, error: netshError.message };
+      }
     } catch (error: any) {
       console.error('clearDns error:', error);
       return { success: false, error: error.message || 'Failed to clear DNS' };
@@ -161,11 +252,30 @@ export class WindowsPlatform extends Platform {
 
   async getActiveDns(): Promise<string[]> {
     try {
-      const interfaceName = await this.getInterfaceName();
-      const cmd = `netsh interface ip show dns "${interfaceName}"`;
-      
-      const { stdout } = await this.execute(cmd);
-      return this.extractDns(stdout);
+      // Method 1: PowerShell Get-DnsClientServerAddress
+      try {
+        const interfaceName = await this.getInterfaceName();
+        const { stdout } = await this.executePowerShell(
+          `(Get-DnsClientServerAddress -InterfaceAlias "${interfaceName}" -AddressFamily IPv4).ServerAddresses -join ","`
+        );
+        const servers = stdout.trim().split(',').filter(s => s && this.isValidIp(s));
+        if (servers.length > 0) {
+          return servers;
+        }
+      } catch (e) {
+        console.log('PowerShell DNS query failed:', e);
+      }
+
+      // Method 2: netsh
+      try {
+        const interfaceName = await this.getInterfaceName();
+        const { stdout } = await this.execute(`netsh interface ipv4 show dnsservers name="${interfaceName}"`);
+        return this.extractDnsFromNetsh(stdout);
+      } catch (e) {
+        console.log('netsh DNS query failed:', e);
+      }
+
+      return [];
     } catch (error) {
       console.error('getActiveDns error:', error);
       return [];
@@ -174,35 +284,15 @@ export class WindowsPlatform extends Platform {
 
   /**
    * Extract DNS servers from netsh output
-   * Handles both static and DHCP configurations
    */
-  private extractDns(output: string): string[] {
+  private extractDnsFromNetsh(output: string): string[] {
     const dnsServers: string[] = [];
     const lines = output.split('\n');
-    
-    let foundStaticSection = false;
-    let foundDhcpSection = false;
 
     for (const line of lines) {
-      const trimmedLine = line.trim();
-      
-      // Check if this is the static DNS section
-      if (trimmedLine.toLowerCase().includes('statically configured')) {
-        foundStaticSection = true;
-        foundDhcpSection = false;
-      }
-      
-      // Check if this is DHCP section
-      if (trimmedLine.toLowerCase().includes('configured through dhcp')) {
-        foundDhcpSection = true;
-        foundStaticSection = false;
-      }
-
-      // Extract IP addresses from the line
-      const ipMatch = trimmedLine.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+      const ipMatch = line.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
       if (ipMatch) {
         const ip = ipMatch[1];
-        // Validate it's a real IP and not already in the list
         if (this.isValidDnsIp(ip) && !dnsServers.includes(ip)) {
           dnsServers.push(ip);
         }
@@ -213,44 +303,36 @@ export class WindowsPlatform extends Platform {
   }
 
   /**
-   * Check if DNS is configured statically (not via DHCP)
+   * Check if DNS is configured statically
    */
-  private async isDnsSetStatically(interfaceName: string): Promise<boolean> {
+  private async isDnsSetStatically(): Promise<boolean> {
     try {
-      const cmd = `netsh interface ip show dns "${interfaceName}"`;
-      const { stdout } = await this.execute(cmd);
+      const interfaceName = await this.getInterfaceName();
+      const { stdout } = await this.execute(`netsh interface ipv4 show dnsservers name="${interfaceName}"`);
       
       const lowerOutput = stdout.toLowerCase();
-      
-      // Check for static configuration indicators
-      if (lowerOutput.includes('statically configured')) {
-        return true;
-      }
-      
-      // Check for DHCP configuration
-      if (lowerOutput.includes('configured through dhcp') || 
-          lowerOutput.includes('dhcp:') ||
-          lowerOutput.includes('dhcp enabled')) {
-        return false;
-      }
-
-      // If there are DNS servers listed but no DHCP mention, likely static
-      const hasIpAddresses = /\d+\.\d+\.\d+\.\d+/.test(stdout);
-      return hasIpAddresses && !lowerOutput.includes('dhcp');
-    } catch (error) {
-      console.error('isDnsSetStatically error:', error);
+      return lowerOutput.includes('statically') || 
+             (lowerOutput.includes('dns') && !lowerOutput.includes('dhcp'));
+    } catch {
       return false;
     }
   }
 
-  /**
-   * Validate if an IP is a valid DNS server address
-   */
+  private isValidIp(ip: string): boolean {
+    if (!ip) return false;
+    const parts = ip.split('.');
+    if (parts.length !== 4) return false;
+    return parts.every(part => {
+      const num = parseInt(part, 10);
+      return num >= 0 && num <= 255 && String(num) === part;
+    });
+  }
+
   private isValidDnsIp(ip: string): boolean {
-    if (!ip || ip === '0.0.0.0') return false;
+    if (!this.isValidIp(ip)) return false;
+    if (ip === '0.0.0.0') return false;
     if (ip.startsWith('169.254.')) return false; // Link-local
     if (ip.startsWith('127.')) return false; // Loopback
-    if (ip.startsWith('fe80:') || ip.startsWith('fec0:')) return false; // IPv6 link-local
     return true;
   }
 
@@ -267,41 +349,32 @@ export class WindowsPlatform extends Platform {
         };
       }
 
-      // Get current DNS servers
       const activeDns = await this.getActiveDns();
-      
-      // Check if DNS is set statically
-      const interfaceName = await this.getInterfaceName();
-      const isStatic = await this.isDnsSetStatically(interfaceName);
-      
-      // Filter valid DNS servers
+      const isStatic = await this.isDnsSetStatically();
       const validDnsServers = activeDns.filter(dns => this.isValidDnsIp(dns));
 
-      // Known DNS providers for matching
+      // Known DNS providers
       const knownDnsProviders = [
-        // Global
-        '8.8.8.8', '8.8.4.4', // Google
-        '1.1.1.1', '1.0.0.1', // Cloudflare
-        '9.9.9.9', '149.112.112.112', // Quad9
-        '208.67.222.222', '208.67.220.220', // OpenDNS
-        '4.2.2.4', '4.2.2.1', '4.2.2.2', '4.2.2.3', // Level3
-        '185.228.168.9', '185.228.169.9', // CleanBrowsing
-        '94.140.14.14', '94.140.15.15', // AdGuard
-        // Iran specific
-        '178.22.122.100', '185.51.200.2', // Shecan
-        '10.202.10.202', '10.202.10.102', // 403
-        '78.157.42.100', '78.157.42.101', // Electro
-        '10.202.10.10', '10.202.10.11', // Radar
-        '5.202.100.100', '5.202.100.101', // Pishgaman
-        '185.55.226.26', '185.55.225.25', // Begzar
-        '85.15.1.14', '85.15.1.15', // Shatel
+        '8.8.8.8', '8.8.4.4',
+        '1.1.1.1', '1.0.0.1',
+        '9.9.9.9', '149.112.112.112',
+        '208.67.222.222', '208.67.220.220',
+        '4.2.2.4', '4.2.2.1', '4.2.2.2', '4.2.2.3',
+        '185.228.168.9', '185.228.169.9',
+        '94.140.14.14', '94.140.15.15',
+        '178.22.122.100', '185.51.200.2',
+        '10.202.10.202', '10.202.10.102',
+        '78.157.42.100', '78.157.42.101',
+        '10.202.10.10', '10.202.10.11',
+        '5.202.100.100', '5.202.100.101',
+        '185.55.226.26', '185.55.225.25',
+        '85.15.1.14', '85.15.1.15',
       ];
 
       let isConnected = false;
       let matchedServer = '';
 
       if (isStatic && validDnsServers.length > 0) {
-        // Check if any DNS matches known providers
         for (const dns of validDnsServers) {
           if (knownDnsProviders.includes(dns)) {
             isConnected = true;
@@ -310,15 +383,11 @@ export class WindowsPlatform extends Platform {
           }
         }
         
-        // Even if not a known provider, if static DNS is set, consider connected
-        // (user might have set a custom DNS)
+        // Consider connected if static DNS is set (even if not a known provider)
         if (!isConnected) {
-          // Only consider NOT connected if DNS looks like a gateway/router
           const isGatewayLike = validDnsServers.every(dns => 
-            (dns.endsWith('.1') && dns.startsWith('192.168.')) ||
-            (dns.startsWith('10.') && dns.endsWith('.1'))
+            (dns.endsWith('.1') && (dns.startsWith('192.168.') || dns.startsWith('10.')))
           );
-          
           if (!isGatewayLike) {
             isConnected = true;
           }
@@ -342,68 +411,30 @@ export class WindowsPlatform extends Platform {
 
   async getNetworkInterfaces(): Promise<NetworkInterface[]> {
     try {
-      // Use the 'network' package for reliable interface detection
-      return new Promise((resolve, reject) => {
-        network.get_interfaces_list((err: Error | null, interfaces: NetworkPackageInterface[]) => {
-          if (err) {
-            console.error('get_interfaces_list error:', err);
-            // Fallback to PowerShell method
-            this.getNetworkInterfacesPowerShell().then(resolve).catch(reject);
-            return;
-          }
-
-          const result: NetworkInterface[] = interfaces.map((iface: NetworkPackageInterface) => ({
-            name: iface.name,
-            displayName: iface.name,
-            type: this.getInterfaceType(iface.name, iface.type),
-            isActive: iface.gateway_ip != null && iface.gateway_ip !== '',
-            ip: iface.ip_address || undefined,
-            mac: iface.mac_address || undefined,
-          }));
-
-          // Sort so active interfaces come first
-          result.sort((a, b) => (b.isActive ? 1 : 0) - (a.isActive ? 1 : 0));
-
-          resolve(result);
-        });
-      });
-    } catch (error) {
-      console.error('getNetworkInterfaces error:', error);
-      return this.getNetworkInterfacesPowerShell();
-    }
-  }
-
-  /**
-   * Fallback method using PowerShell for interface detection
-   */
-  private async getNetworkInterfacesPowerShell(): Promise<NetworkInterface[]> {
-    try {
+      // Use PowerShell Get-NetAdapter
       const { stdout } = await this.executePowerShell(
-        `Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -or $_.Status -eq 'Disconnected' } | Select-Object Name, InterfaceDescription, Status, MediaType | ConvertTo-Json`
+        `Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -or $_.Status -eq 'Disconnected' } | Select-Object Name, Status, MediaType | ConvertTo-Json -Compress`
       );
       
-      if (!stdout.trim()) {
-        return [];
+      if (!stdout.trim() || stdout.includes('error')) {
+        return this.getNetworkInterfacesNetsh();
       }
 
-      const adapters = JSON.parse(stdout);
-      const adapterArray = Array.isArray(adapters) ? adapters : [adapters];
+      const parsed = JSON.parse(stdout);
+      const adapters = Array.isArray(parsed) ? parsed : [parsed];
       
-      return adapterArray.map((adapter: any) => ({
+      return adapters.map((adapter: any) => ({
         name: adapter.Name,
         displayName: adapter.Name,
         type: this.getInterfaceType(adapter.Name, adapter.MediaType),
         isActive: adapter.Status === 'Up',
       }));
     } catch (error) {
-      console.error('getNetworkInterfacesPowerShell error:', error);
+      console.error('getNetworkInterfaces error:', error);
       return this.getNetworkInterfacesNetsh();
     }
   }
 
-  /**
-   * Fallback method using netsh for interface detection
-   */
   private async getNetworkInterfacesNetsh(): Promise<NetworkInterface[]> {
     try {
       const { stdout } = await this.execute('netsh interface show interface');
@@ -451,6 +482,7 @@ export class WindowsPlatform extends Platform {
       await this.execute('ipconfig /flushdns');
       return { success: true, message: 'DNS cache flushed successfully' };
     } catch (error: any) {
+      console.error('flushDnsCache error:', error);
       return { success: false, error: error.message };
     }
   }
@@ -477,56 +509,27 @@ export class WindowsPlatform extends Platform {
     }
   }
 
-  /**
-   * Check if WMIC is available (some Windows versions don't have it)
-   */
-  async isWmicAvailable(): Promise<boolean> {
-    try {
-      await this.execute('wmic os get caption');
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Set the network interface to use for DNS operations
-   */
   setInterface(interfaceName: string) {
     this.selectedInterface = interfaceName;
-    // Clear cache when interface changes
-    this.cachedActiveInterface = null;
-  }
-
-  /**
-   * Execute a netsh command
-   * On Windows, the app runs with admin privileges (requestedExecutionLevel in package.json)
-   * So we can execute commands directly
-   */
-  private async executeNetsh(command: string): Promise<{ stdout: string; stderr: string }> {
-    try {
-      // First try direct execution (works when app is run as admin)
-      return await execAsync(command, { encoding: 'utf8', timeout: 30000 });
-    } catch (error: any) {
-      console.error('Direct netsh execution failed:', error.message);
-      
-      // Fallback: try using PowerShell with elevated context
-      try {
-        const psCommand = `powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& {${command.replace(/"/g, '\\"')}}"`;
-        return await execAsync(psCommand, { encoding: 'utf8', timeout: 30000 });
-      } catch (psError: any) {
-        console.error('PowerShell netsh execution failed:', psError.message);
-        throw new Error(`Failed to execute command. Please run the application as Administrator. Original error: ${error.message}`);
-      }
-    }
+    this.cachedInterfaceName = null;
   }
 
   private async executePowerShell(command: string): Promise<{ stdout: string; stderr: string }> {
-    const psCommand = `powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "${command.replace(/"/g, '\\"')}"`;
-    return execAsync(psCommand, { encoding: 'utf8', timeout: 30000 });
+    // Escape double quotes for PowerShell
+    const escapedCommand = command.replace(/"/g, '\\"');
+    const fullCommand = `powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "${escapedCommand}"`;
+    return execAsync(fullCommand, { 
+      encoding: 'utf8', 
+      timeout: 30000,
+      windowsHide: true,
+    });
   }
 
   protected async execute(command: string): Promise<{ stdout: string; stderr: string }> {
-    return execAsync(command, { encoding: 'utf8', timeout: 30000 });
+    return execAsync(command, { 
+      encoding: 'utf8', 
+      timeout: 30000,
+      windowsHide: true,
+    });
   }
 }

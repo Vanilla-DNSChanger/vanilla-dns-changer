@@ -34,7 +34,6 @@
     "@emotion/is-prop-valid": "^1.4.0",
     "@vanilla-dns/shared": "workspace:*",
     "electron-updater": "^6.1.7",
-    "network": "^0.7.0",
     "sudo-prompt": "^9.2.1",
     "uuid": "^9.0.1"
   },

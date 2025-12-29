@@ -11,9 +11,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": false,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "declaration": false
   },
-  "include": ["src/main/**/*", "src/types/**/*"],
+  "include": ["src/main/**/*"],
   "exclude": ["node_modules"]
 }
