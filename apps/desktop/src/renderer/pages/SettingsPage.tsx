@@ -18,7 +18,7 @@ import { useStore } from '../store';
 import { useTranslation } from '../hooks';
 import { URLS, APP_INFO } from '@vanilla-dns/shared';
 import type { AppConfig, NetworkInterface } from '@vanilla-dns/shared';
-import logoSvg from '../assets/logo.svg';
+import logoSvg from '../../assets/logo.svg';
 
 export function SettingsPage() {
   const { config, setConfig } = useStore();

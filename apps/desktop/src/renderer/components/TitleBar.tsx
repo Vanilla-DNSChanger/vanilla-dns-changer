@@ -1,6 +1,6 @@
 import { Minus, Square, X } from 'lucide-react';
 import { useTranslation } from '../hooks';
-import logoSvg from '../assets/logo.svg';
+import logoSvg from '../../assets/logo.svg';
 
 export function TitleBar() {
   const { rtl, t } = useTranslation();
