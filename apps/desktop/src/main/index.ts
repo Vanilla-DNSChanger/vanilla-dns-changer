@@ -45,7 +45,22 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    // Open DevTools in production for debugging (press Ctrl+Shift+I or F12)
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if ((input.control && input.shift && input.key === 'I') || input.key === 'F12') {
+        mainWindow?.webContents.toggleDevTools();
+      }
+    });
   }
+
+  // Log any errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Failed to load:', errorCode, errorDescription);
+  });
+
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log('Renderer:', message);
+  });
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
