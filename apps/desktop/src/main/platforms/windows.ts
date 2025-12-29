@@ -104,22 +104,34 @@ export class WindowsPlatform extends Platform {
 
   async getActiveDns(): Promise<string[]> {
     try {
-      // Use PowerShell which gives cleaner output
-      const { stdout } = await this.executePowerShell(
-        `(Get-DnsClientServerAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -eq "${this.selectedInterface || 'Wi-Fi'}" }).ServerAddresses -join ","`
-      );
-      
-      const dnsServers = stdout.trim().split(',').filter(s => s && s !== '');
-      if (dnsServers.length > 0) {
-        return dnsServers;
+      // Get the interface to check
+      let interfaceToCheck = this.selectedInterface;
+      if (!interfaceToCheck) {
+        const interfaces = await this.getNetworkInterfaces();
+        const activeInterface = interfaces.find(i => i.isActive);
+        if (activeInterface) {
+          interfaceToCheck = activeInterface.name;
+        }
       }
 
-      // Fallback: get DNS from any active interface
+      if (interfaceToCheck) {
+        // Use PowerShell to get DNS specifically for the interface
+        const { stdout } = await this.executePowerShell(
+          `Get-DnsClientServerAddress -InterfaceAlias "${interfaceToCheck}" -AddressFamily IPv4 | Select-Object -ExpandProperty ServerAddresses`
+        );
+        
+        const dnsServers = stdout.trim().split(/\r?\n/).filter(s => s && s.trim() !== '');
+        if (dnsServers.length > 0) {
+          return dnsServers;
+        }
+      }
+
+      // Fallback: get DNS from any active interface that has DNS configured
       const { stdout: allDns } = await this.executePowerShell(
-        `(Get-DnsClientServerAddress -AddressFamily IPv4 | Where-Object { $_.ServerAddresses.Count -gt 0 } | Select-Object -First 1).ServerAddresses -join ","`
+        `Get-DnsClientServerAddress -AddressFamily IPv4 | Where-Object { $_.ServerAddresses.Count -gt 0 } | Select-Object -First 1 -ExpandProperty ServerAddresses`
       );
       
-      return allDns.trim().split(',').filter(s => s && s !== '');
+      return allDns.trim().split(/\r?\n/).filter(s => s && s.trim() !== '');
     } catch {
       // Fallback to netsh
       return this.getActiveDnsNetsh();
@@ -158,28 +170,61 @@ export class WindowsPlatform extends Platform {
       this.selectedInterface = activeInterface.name;
     }
 
-    // Check if connected to a custom DNS (not DHCP/local)
-    // Local DNS usually starts with 127., 192.168., 10., or 172.16-31.
-    // Also exclude APIPA addresses (169.254.x.x) and fec0:
-    const isCustomDns = activeDns.length > 0 && activeDns.some(dns => {
-      // Skip empty or invalid
+    // Filter out non-DNS addresses (like adapter IPs)
+    // DNS servers are usually well-known public IPs or specific DNS providers
+    const validDnsServers = activeDns.filter(dns => {
       if (!dns || dns === '0.0.0.0') return false;
       // Skip IPv6 link-local
       if (dns.startsWith('fec0:') || dns.startsWith('fe80:')) return false;
-      // Skip APIPA
+      // Skip APIPA (169.254.x.x)
       if (dns.startsWith('169.254.')) return false;
       // Skip localhost
       if (dns.startsWith('127.')) return false;
-      // Skip common private/local DNS (usually routers)
-      if (dns.startsWith('192.168.') && dns.endsWith('.1')) return false;
-      if (dns === '192.168.1.1' || dns === '192.168.0.1') return false;
-      // Consider it custom DNS if it's a known public DNS or Vanilla DNS range
+      
+      // Check if this looks like a valid DNS (not a random private IP)
+      // Common private IP ranges that are NOT typically DNS:
+      // 10.x.x.x - usually VPN/internal but some like 10.127.x.x might be adapter IPs
+      // Most valid DNS are well-known: 8.8.8.8, 1.1.1.1, 4.2.2.4, etc.
       return true;
+    });
+
+    // Determine if we're connected to a custom DNS
+    // If DNS array is empty or only contains router/DHCP DNS, we're not connected
+    const isCustomDns = validDnsServers.length > 0 && validDnsServers.some(dns => {
+      // Known public DNS providers
+      const knownDns = [
+        '8.8.8.8', '8.8.4.4',           // Google
+        '1.1.1.1', '1.0.0.1',           // Cloudflare
+        '9.9.9.9', '149.112.112.112',   // Quad9
+        '208.67.222.222', '208.67.220.220', // OpenDNS
+        '4.2.2.4', '4.2.2.1', '4.2.2.2', '4.2.2.3', // Level3
+        '185.228.168.9', '185.228.169.9', // CleanBrowsing
+        '76.76.19.19', '76.223.122.150', // Alternate DNS
+        '94.140.14.14', '94.140.15.15', // AdGuard
+        '78.157.42.100', '78.157.42.101', // Shecan
+        '10.202.10.202', '10.202.10.102', // 403
+        '178.22.122.100', '185.51.200.2', // Electro/Radar
+        '5.202.100.100', '5.202.100.101', // Pishgaman
+      ];
+      
+      // If it's a known DNS, definitely connected
+      if (knownDns.includes(dns)) return true;
+      
+      // Skip common router/gateway addresses
+      if (dns.match(/^192\.168\.\d+\.1$/)) return false;
+      if (dns === '192.168.1.1' || dns === '192.168.0.1') return false;
+      if (dns.match(/^10\.\d+\.\d+\.1$/)) return false;
+      
+      // Consider other IPs as potentially custom DNS
+      return !dns.startsWith('192.168.') && !dns.startsWith('172.16.') && 
+             !dns.startsWith('172.17.') && !dns.startsWith('172.18.') &&
+             !dns.startsWith('172.19.') && !dns.startsWith('172.2') &&
+             !dns.startsWith('172.30.') && !dns.startsWith('172.31.');
     });
 
     return {
       isConnected: isCustomDns,
-      activeDns,
+      activeDns: validDnsServers,
       activeInterface,
     };
   }
@@ -195,8 +240,8 @@ export class WindowsPlatform extends Platform {
       const adapterArray = Array.isArray(adapters) ? adapters : [adapters];
       
       return adapterArray.map((adapter: any) => ({
-        name: adapter.Name,
-        displayName: adapter.InterfaceDescription || adapter.Name,
+        name: adapter.Name,  // Use the short name (e.g., "Ethernet 2") for operations
+        displayName: adapter.Name, // Show the short name to user, not the long description
         type: this.getInterfaceType(adapter.Name, adapter.MediaType),
         isActive: adapter.Status === 'Up',
       }));

@@ -96,7 +96,9 @@ export function SettingsPage() {
     >
       <div
         className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${
-          checked ? 'translate-x-7' : 'translate-x-1'
+          rtl 
+            ? (checked ? 'translate-x-1' : 'translate-x-7')
+            : (checked ? 'translate-x-7' : 'translate-x-1')
         }`}
       />
     </button>
@@ -264,7 +266,7 @@ export function SettingsPage() {
         <h2 className={`text-lg font-semibold text-white mb-4 ${rtl ? 'text-right' : ''}`}>{t.settings.about}</h2>
 
         <div className="p-6 bg-vanilla-dark-100 border border-vanilla-dark-300 rounded-xl">
-          <div className={`flex items-center gap-4 mb-4 \${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center gap-4 mb-4 ${rtl ? 'flex-row-reverse' : ''}`}>
             <img src="/logo.png" alt="Logo" className="w-12 h-12" />
             <div className={rtl ? 'text-right' : ''}>
               <h3 className="text-xl font-bold text-white">{t.app.name}</h3>
@@ -272,19 +274,19 @@ export function SettingsPage() {
             </div>
           </div>
 
-          <p className={`text-gray-400 mb-4 \${rtl ? 'text-right' : ''}`}>{t.app.tagline}</p>
+          <p className={`text-gray-400 mb-4 ${rtl ? 'text-right' : ''}`}>{t.app.tagline}</p>
 
-          <div className={`flex gap-3 \${rtl ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
             <button
               onClick={() => openExternal(URLS.GITHUB_REPO)}
-              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors \${rtl ? 'flex-row-reverse' : ''}`}
+              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors ${rtl ? 'flex-row-reverse' : ''}`}
             >
               <ExternalLink className="w-4 h-4" />
               {t.settings.github}
             </button>
             <button
               onClick={() => openExternal(URLS.WEBSITE)}
-              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors \${rtl ? 'flex-row-reverse' : ''}`}
+              className={`flex items-center gap-2 px-4 py-2 bg-vanilla-dark-200 hover:bg-vanilla-dark-300 rounded-lg text-white transition-colors ${rtl ? 'flex-row-reverse' : ''}`}
             >
               <ExternalLink className="w-4 h-4" />
               {t.settings.website}

@@ -130,9 +130,11 @@ function App() {
       <TitleBar />
 
       {/* Main Content */}
-      <div className={`flex flex-1 overflow-hidden ${rtl ? 'flex-row-reverse' : ''}`}>
-        {/* Sidebar */}
-        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - position based on RTL */}
+        <div className={`${rtl ? 'order-last border-l border-r-0' : 'order-first border-r border-l-0'} border-vanilla-dark-300`}>
+          <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+        </div>
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-6">

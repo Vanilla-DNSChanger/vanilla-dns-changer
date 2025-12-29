@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
-  const { t } = useTranslation();
+  const { t, rtl } = useTranslation();
   
   const navItems = [
     { id: 'home' as const, icon: Home, label: t.nav.home },
@@ -23,7 +23,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   };
 
   return (
-    <div className="w-16 bg-vanilla-dark-100 border-r border-vanilla-dark-300 flex flex-col items-center py-4">
+    <div className="w-16 bg-vanilla-dark-100 flex flex-col items-center py-4">
       {/* Navigation Items */}
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (

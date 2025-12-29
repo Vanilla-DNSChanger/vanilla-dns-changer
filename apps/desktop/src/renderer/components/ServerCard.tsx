@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pin, PinOff, Signal, Star, Trash2 } from 'lucide-react';
 import type { DnsServer } from '@vanilla-dns/shared';
 import { useStore } from '../store';
+import { useTranslation } from '../hooks';
 
 interface ServerCardProps {
   server: DnsServer;
@@ -25,6 +26,7 @@ export function ServerCard({
   const [latency, setLatency] = useState<number | null>(null);
   const [isPinging, setIsPinging] = useState(false);
   const { pingServer } = useStore();
+  const { rtl } = useTranslation();
 
   const handlePing = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -60,10 +62,11 @@ export function ServerCard({
     <div
       onClick={() => onSelect(server)}
       className={`server-card ${isSelected ? 'selected' : ''} card-hover`}
+      dir={rtl ? 'rtl' : 'ltr'}
     >
-      <div className="flex items-start justify-between">
+      <div className={`flex items-start justify-between ${rtl ? 'flex-row-reverse' : ''}`}>
         {/* Server Info */}
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${rtl ? 'flex-row-reverse' : ''}`}>
           {/* Avatar */}
           <div className="w-10 h-10 rounded-lg bg-vanilla-dark-200 flex items-center justify-center text-lg">
             {server.avatar ? (
@@ -74,8 +77,8 @@ export function ServerCard({
           </div>
 
           {/* Name and Servers */}
-          <div>
-            <h3 className="font-medium text-white flex items-center gap-2">
+          <div className={rtl ? 'text-right' : ''}>
+            <h3 className={`font-medium text-white flex items-center gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
               {server.name}
               {server.country && (
                 <span className="text-xs text-gray-500">{server.country}</span>
@@ -88,7 +91,7 @@ export function ServerCard({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1">
+        <div className={`flex items-center gap-1 ${rtl ? 'flex-row-reverse' : ''}`}>
           {/* Latency */}
           <button
             onClick={handlePing}
@@ -133,7 +136,7 @@ export function ServerCard({
 
       {/* Tags */}
       {server.tags && server.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-3">
+        <div className={`flex flex-wrap gap-1 mt-3 ${rtl ? 'flex-row-reverse' : ''}`}>
           {server.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
