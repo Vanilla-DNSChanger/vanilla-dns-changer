@@ -8,6 +8,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Polyfill for require - prevents framer-motion's dynamic require error -->
+    <script>
+      if (typeof window.require === 'undefined') {
+        window.require = function(moduleName) {
+          // Return a mock for @emotion/is-prop-valid
+          if (moduleName === '@emotion/is-prop-valid') {
+            return { default: function() { return true; } };
+          }
+          return {};
+        };
+      }
+    </script>
   </head>
   <body class="bg-vanilla-dark text-white antialiased">
     <div id="root"></div>
