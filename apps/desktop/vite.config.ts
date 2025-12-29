@@ -37,7 +37,12 @@ export default defineConfig({
         },
       },
     ]),
-    renderer(),
+    renderer({
+      resolve: {
+        // Don't externalize @vanilla-dns/shared - bundle it instead
+        '@vanilla-dns/shared': { type: 'esm' },
+      },
+    }),
   ],
   resolve: {
     alias: {
@@ -45,17 +50,24 @@ export default defineConfig({
       '@shared': resolve(__dirname, './src/shared'),
       '@renderer': resolve(__dirname, './src/renderer'),
       '@main': resolve(__dirname, './src/main'),
+      // Force ESM version of shared package
+      '@vanilla-dns/shared': resolve(__dirname, '../../packages/shared/dist/index.js'),
     },
   },
   optimizeDeps: {
     include: ['@vanilla-dns/shared'],
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   build: {
     outDir: 'dist/renderer',
     emptyOutDir: true,
-    commonjsOptions: {
-      include: [/node_modules/, /@vanilla-dns\/shared/],
-      transformMixedEsModules: true,
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        format: 'es',
+      },
     },
   },
   server: {
