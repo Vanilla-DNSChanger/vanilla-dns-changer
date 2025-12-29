@@ -1,8 +1,10 @@
+/* Vazirmatn font for Persian */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Vazirmatn font for Persian - loaded via index.html */
 .font-vazir {
   font-family: 'Vazirmatn', sans-serif;
 }
@@ -202,4 +204,11 @@
 [dir="rtl"] .mr-auto {
   margin-right: 0;
   margin-left: auto;
+}
+
+/* Vazirmatn font for Persian */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
+.font-vazir {
+  font-family: 'Vazirmatn', sans-serif;
 }
