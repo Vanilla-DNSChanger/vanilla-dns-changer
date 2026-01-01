@@ -23,16 +23,16 @@ export function ServerCard({
   onUnpin,
   onDelete,
 }: ServerCardProps) {
-  const [latency, setLatency] = useState<number | null>(null);
+  const { pingServer, serverLatencies, setLatency } = useStore();
+  const latency = serverLatencies[server.key];
   const [isPinging, setIsPinging] = useState(false);
-  const { pingServer } = useStore();
   const { rtl } = useTranslation();
 
   const handlePing = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsPinging(true);
     const result = await pingServer(server.servers[0]);
-    setLatency(result);
+    setLatency(server.key, result);
     setIsPinging(false);
   };
 
@@ -51,7 +51,7 @@ export function ServerCard({
   };
 
   const getLatencyColor = () => {
-    if (latency === null) return 'text-gray-500';
+    if (typeof latency !== 'number') return 'text-gray-500';
     if (latency < 0) return 'text-red-500';
     if (latency < 100) return 'text-vanilla-green-400';
     if (latency < 200) return 'text-yellow-500';
@@ -97,7 +97,7 @@ export function ServerCard({
           >
             {isPinging ? (
               <Signal className="w-4 h-4 animate-pulse" />
-            ) : latency !== null ? (
+            ) : typeof latency === 'number' ? (
               <span className="text-xs font-mono">
                 {latency < 0 ? 'ERR' : `${latency}ms`}
               </span>

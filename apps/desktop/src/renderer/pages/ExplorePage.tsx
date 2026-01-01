@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Star } from 'lucide-react';
+import { Search, Filter, Star, Signal } from 'lucide-react';
 import { useStore } from '../store';
 import { ServerCard } from '../components/ServerCard';
 import { useTranslation } from '../hooks';
@@ -23,6 +23,9 @@ export function ExplorePage() {
   const { t, rtl } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState<'recommended' | 'ping' | 'rating' | 'name'>('recommended');
+
+  const { serverLatencies, pingAllServers, isPingingAll } = useStore();
 
   // Filter servers - put Vanilla DNS first
   const filteredServers = useMemo(() => {
@@ -44,15 +47,37 @@ export function ExplorePage() {
       result = result.filter((server) => server.tags.includes(selectedCategory));
     }
 
-    // Sort: Vanilla DNS first, then by rating
+    // Sort servers Vanilla DNS first
     result.sort((a, b) => {
       if (a.key === 'vanilla') return -1;
       if (b.key === 'vanilla') return 1;
-      return (b.rating || 0) - (a.rating || 0);
+
+      if (sortBy === 'recommended') {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+
+      if (sortBy === 'ping') {
+        const latencyA = serverLatencies[a.key] ?? 9999;
+        const latencyB = serverLatencies[b.key] ?? 9999;
+        // Handle error pings (-1)
+        const effectiveA = latencyA < 0 ? 10000 : latencyA;
+        const effectiveB = latencyB < 0 ? 10000 : latencyB;
+        return effectiveA - effectiveB;
+      }
+
+      if (sortBy === 'rating') {
+        return (b.rating || 0) - (a.rating || 0);
+      }
+
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      }
+
+      return 0;
     });
 
     return result;
-  }, [servers, customServers, searchQuery, selectedCategory]);
+  }, [servers, customServers, searchQuery, selectedCategory, sortBy, serverLatencies]);
 
   const handleServerSelect = (server: DnsServer) => {
     setSelectedServer(server);
@@ -106,11 +131,39 @@ export function ExplorePage() {
         ))}
       </div>
 
-      {/* Results Count */}
+      {/* Results Count and Actions */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">
           {filteredServers.length} {t.servers.all}
         </p>
+
+        <div className="flex items-center gap-3">
+          {/* Sort Dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="bg-vanilla-dark-100 border border-vanilla-dark-300 text-gray-400 text-sm rounded-lg focus:ring-vanilla-green-400 focus:border-vanilla-green-400 block px-3 py-1.5 transition-colors outline-none cursor-pointer hover:text-white"
+          >
+            <option value="recommended">{t.home.recommendedServer}</option>
+            <option value="ping">Ping (Low to High)</option>
+            <option value="rating">Rating (High to Low)</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+
+          {/* Ping All Button */}
+          <button
+            onClick={() => pingAllServers(filteredServers)}
+            disabled={isPingingAll || filteredServers.length === 0}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              isPingingAll
+                ? 'bg-vanilla-dark-200 text-gray-500 cursor-not-allowed'
+                : 'bg-vanilla-dark-100 text-gray-400 hover:bg-vanilla-dark-200 hover:text-white'
+            }`}
+          >
+            <Signal className={`w-4 h-4 ${isPingingAll ? 'animate-pulse text-vanilla-green-400' : ''}`} />
+            {isPingingAll ? 'Pinging...' : 'Ping All'}
+          </button>
+        </div>
       </div>
 
       {/* Servers Grid */}
