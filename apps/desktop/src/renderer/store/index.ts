@@ -23,6 +23,10 @@ interface AppState {
   // Config
   config: AppConfig;
 
+  // Latencies
+  serverLatencies: Record<string, number | null>;
+  isPingingAll: boolean;
+
   // Actions
   setStatus: (status: DnsStatus) => void;
   setIsConnecting: (isConnecting: boolean) => void;
@@ -31,6 +35,8 @@ interface AppState {
   setCustomServers: (servers: CustomDnsServer[]) => void;
   setPinnedServerKeys: (keys: string[]) => void;
   setConfig: (config: Partial<AppConfig>) => void;
+  setLatency: (key: string, latency: number | null) => void;
+  setIsPingingAll: (isPinging: boolean) => void;
 
   // Async Actions
   loadConfig: () => Promise<void>;
@@ -40,6 +46,7 @@ interface AppState {
   disconnect: () => Promise<boolean>;
   flushDns: () => Promise<boolean>;
   pingServer: (server: string) => Promise<number>;
+  pingAllServers: (servers: DnsServer[]) => Promise<void>;
   addCustomServer: (server: CustomDnsServer) => Promise<void>;
   removeCustomServer: (key: string) => Promise<void>;
   pinServer: (key: string) => Promise<void>;
@@ -59,6 +66,8 @@ export const useStore = create<AppState>((set, get) => ({
   customServers: [],
   pinnedServerKeys: [],
   config: DEFAULT_CONFIG,
+  serverLatencies: {},
+  isPingingAll: false,
 
   // Setters
   setStatus: (status) => set({ status }),
@@ -68,6 +77,11 @@ export const useStore = create<AppState>((set, get) => ({
   setCustomServers: (customServers) => set({ customServers }),
   setPinnedServerKeys: (pinnedServerKeys) => set({ pinnedServerKeys }),
   setConfig: (config) => set((state) => ({ config: { ...state.config, ...config } })),
+  setLatency: (key, latency) =>
+    set((state) => ({
+      serverLatencies: { ...state.serverLatencies, [key]: latency },
+    })),
+  setIsPingingAll: (isPingingAll) => set({ isPingingAll }),
 
   // Async Actions
   loadConfig: async () => {
@@ -189,6 +203,18 @@ export const useStore = create<AppState>((set, get) => ({
       return result.success ? result.latency : -1;
     } catch {
       return -1;
+    }
+  },
+  
+  pingAllServers: async (serversToPing) => {
+    set({ isPingingAll: true });
+    try {
+      for (const server of serversToPing) {
+        const latency = await get().pingServer(server.servers[0]);
+        get().setLatency(server.key, latency);
+      }
+    } finally {
+      set({ isPingingAll: false });
     }
   },
 
